@@ -7,7 +7,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 class FScope(scope: CoroutineScope = MainScope()) {
     private val _scope = scope
-    private val _jobHolder: MutableMap<Job, String> = WeakHashMap()
+    private var _jobHolder: MutableMap<Job, String>? = null
 
     /**
      * 启动协程
@@ -22,8 +22,11 @@ class FScope(scope: CoroutineScope = MainScope()) {
             context = context,
             start = start,
             block = block,
-        ).also {
-            _jobHolder[it] = ""
+        ).also { job ->
+            val holder = _jobHolder ?: WeakHashMap<Job, String>().also { map ->
+                _jobHolder = map
+            }
+            holder[job] = ""
         }
     }
 
@@ -32,7 +35,9 @@ class FScope(scope: CoroutineScope = MainScope()) {
      */
     @Synchronized
     fun cancel() {
-        _jobHolder.keys.forEach { it.cancel() }
-        _jobHolder.clear()
+        _jobHolder?.let { holder ->
+            holder.keys.forEach { it.cancel() }
+            _jobHolder = null
+        }
     }
 }
