@@ -7,7 +7,6 @@ import com.sd.demo.coroutine.databinding.ActivityContinuationBinding
 import com.sd.lib.coroutine.FContinuation
 import com.sd.lib.coroutine.FScope
 import java.util.*
-import kotlin.coroutines.cancellation.CancellationException
 
 class SampleContinuationActivity : AppCompatActivity(), View.OnClickListener {
     private val _binding by lazy { ActivityContinuationBinding.inflate(layoutInflater) }
@@ -33,6 +32,10 @@ class SampleContinuationActivity : AppCompatActivity(), View.OnClickListener {
             }
             _binding.btnCancel -> {
                 _continuation.cancel()
+                logMsg { "FContinuation size:${_continuation.size()}" }
+            }
+            _binding.btnCancelLaunch -> {
+                _scope.cancel()
                 logMsg { "FContinuation size:${_continuation.size()}" }
             }
         }

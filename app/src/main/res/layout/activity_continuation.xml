@@ -28,4 +28,12 @@
         android:text="cancel"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btn_cancel_launch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="cancel launch"
+        android:textAllCaps="false" />
+
 </LinearLayout>
