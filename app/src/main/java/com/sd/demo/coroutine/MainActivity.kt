@@ -25,5 +25,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 }
 
 fun logMsg(block: () -> String) {
-    Log.i("FCoroutine-demo", block())
+    Log.i("coroutine-demo", block())
 }
