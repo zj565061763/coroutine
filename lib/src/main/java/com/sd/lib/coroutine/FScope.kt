@@ -33,11 +33,8 @@ class FScope(scope: CoroutineScope = MainScope()) {
         while (_jobHolder.isNotEmpty()) {
             val copyKeys = _jobHolder.keys.toHashSet()
             copyKeys.forEach { job ->
-                try {
-                    job.cancel()
-                } finally {
-                    _jobHolder.remove(job)
-                }
+                job.cancel()
+                _jobHolder.remove(job)
             }
         }
     }
