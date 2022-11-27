@@ -31,7 +31,7 @@ class FContinuation<T> {
     }
 
     fun cancel(cause: Throwable? = null) {
-        foreach {
+        foreach(remove = false) {
             it.cancel(cause)
         }
     }
@@ -40,14 +40,16 @@ class FContinuation<T> {
         return _continuationHolder.size
     }
 
-    private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
+    private fun foreach(remove: Boolean = true, block: (CancellableContinuation<T>) -> Unit) {
         while (_continuationHolder.isNotEmpty()) {
             val copyHolder = _continuationHolder.toList()
             copyHolder.forEach {
                 try {
                     block(it)
                 } finally {
-                    _continuationHolder.remove(it)
+                    if (remove) {
+                        _continuationHolder.remove(it)
+                    }
                 }
             }
         }
