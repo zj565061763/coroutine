@@ -2,7 +2,7 @@ package com.sd.lib.coroutine
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.*
+import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -40,7 +40,10 @@ class FContinuation<T> {
         return _continuationHolder.size
     }
 
-    private fun foreach(remove: Boolean = true, block: (CancellableContinuation<T>) -> Unit) {
+    private fun foreach(
+        remove: Boolean = true,
+        block: (CancellableContinuation<T>) -> Unit,
+    ) {
         while (_continuationHolder.isNotEmpty()) {
             val copyHolder = _continuationHolder.toList()
             copyHolder.forEach {
