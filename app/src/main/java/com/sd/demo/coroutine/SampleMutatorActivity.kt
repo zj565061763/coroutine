@@ -36,7 +36,7 @@ class SampleMutatorActivity : AppCompatActivity() {
         }
 
         _binding.btnCancel.setOnClickListener {
-            _scope.cancel()
+            _mutator.cancel()
         }
     }
 
