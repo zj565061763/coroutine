@@ -22,18 +22,13 @@ class SampleContinuationActivity : AppCompatActivity() {
             }
         }
 
-        _binding.btnResumeAwait.setOnClickListener {
+        _binding.btnResume.setOnClickListener {
             _continuation.resume("hello")
             logMsg { "FContinuation size:${_continuation.size()}" }
         }
 
-        _binding.btnCancelAwait.setOnClickListener {
-            _continuation.cancel()
-            logMsg { "FContinuation size:${_continuation.size()}" }
-        }
-
         _binding.btnCancel.setOnClickListener {
-            _scope.cancel()
+            _continuation.cancel()
             logMsg { "FContinuation size:${_continuation.size()}" }
         }
     }

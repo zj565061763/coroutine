@@ -13,17 +13,10 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_resume_await"
+        android:id="@+id/btn_resume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="resume await"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btn_cancel_await"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="cancel await"
+        android:text="resume"
         android:textAllCaps="false" />
 
     <Button
