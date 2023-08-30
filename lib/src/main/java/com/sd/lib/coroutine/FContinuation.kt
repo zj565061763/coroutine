@@ -47,8 +47,7 @@ class FContinuation<T> {
         block: (CancellableContinuation<T>) -> Unit,
     ) {
         while (_continuationHolder.isNotEmpty()) {
-            val copyHolder = _continuationHolder.toList()
-            copyHolder.forEach {
+            _continuationHolder.toList().forEach {
                 try {
                     block(it)
                 } finally {
