@@ -47,7 +47,7 @@ class FContinuation<T> {
         block: (CancellableContinuation<T>) -> Unit,
     ) {
         while (_continuationHolder.isNotEmpty()) {
-            _continuationHolder.toList().forEach {
+            _continuationHolder.toMutableList().forEach {
                 try {
                     block(it)
                 } finally {
