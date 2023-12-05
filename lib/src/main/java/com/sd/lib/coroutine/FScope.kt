@@ -1,7 +1,12 @@
 package com.sd.lib.coroutine
 
-import kotlinx.coroutines.*
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.util.Collections
+import java.util.WeakHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -23,6 +28,9 @@ class FScope(scope: CoroutineScope = MainScope()) {
             block = block,
         ).also { job ->
             _jobHolder[job] = ""
+            job.invokeOnCompletion {
+                _jobHolder.remove(job)
+            }
         }
     }
 
