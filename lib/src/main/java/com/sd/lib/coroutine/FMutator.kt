@@ -23,7 +23,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
 
-open class FMutator {
+class FMutator {
     private class Mutator(val priority: Int, val job: Job) {
         fun canInterrupt(other: Mutator) = priority >= other.priority
 
