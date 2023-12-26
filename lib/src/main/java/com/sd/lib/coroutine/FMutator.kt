@@ -68,10 +68,6 @@ class FMutator {
         action()
     }
 
-    suspend fun cancelOthers() {
-        mutate(priority = Int.MAX_VALUE) { }
-    }
-
     fun cancel() {
         while (true) {
             val mutator = currentMutator.get() ?: return
