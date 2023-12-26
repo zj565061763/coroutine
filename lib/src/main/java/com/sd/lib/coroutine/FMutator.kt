@@ -68,7 +68,7 @@ class FMutator {
         action()
     }
 
-    suspend fun cancelOther() {
+    suspend fun cancelOthers() {
         mutate(priority = Int.MAX_VALUE) { }
     }
 
