@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class FMutableFlowStore<T : MutableSharedFlow<*>> {
-    private val _flows: MutableMap<String, T> = hashMapOf()
+    private val _flows: MutableMap<Any, T> = hashMapOf()
     private var _scope: CoroutineScope? = null
 
     /**
      * 获取[key]对应的[MutableSharedFlow]，当[MutableSharedFlow.subscriptionCount]为0时，会移除该Flow
      */
     fun get(
-        key: String,
+        key: Any,
         factory: () -> T,
     ): T {
         synchronized(this@FMutableFlowStore) {
@@ -46,7 +46,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
     }
 
     private fun createFlowLocked(
-        key: String,
+        key: Any,
         factory: () -> T,
     ): T {
         return factory().also { flow ->
