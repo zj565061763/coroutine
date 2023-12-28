@@ -41,8 +41,8 @@ class FScope(scope: CoroutineScope = MainScope()) {
     fun cancel() {
         while (_jobHolder.isNotEmpty()) {
             _jobHolder.keys.toMutableList().forEach { job ->
-                job.cancel()
                 _jobHolder.remove(job)
+                job.cancel()
             }
         }
     }
