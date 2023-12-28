@@ -45,4 +45,11 @@ class FScope(scope: CoroutineScope = MainScope()) {
             }
         }
     }
+
+    /**
+     * 通过[launch]启动的存活协程数量
+     */
+    fun size(): Int {
+        return _jobHolder.size
+    }
 }
