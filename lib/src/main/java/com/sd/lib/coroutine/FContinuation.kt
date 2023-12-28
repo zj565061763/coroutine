@@ -50,7 +50,9 @@ class FContinuation<T> {
     ) {
         while (_holder.isNotEmpty()) {
             _holder.toTypedArray().forEach { cont ->
-                if (remove) _holder.remove(cont)
+                if (remove) {
+                    _holder.remove(cont)
+                }
                 block(cont)
             }
         }
