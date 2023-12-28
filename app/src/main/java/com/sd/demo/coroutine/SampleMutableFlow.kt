@@ -21,7 +21,6 @@ class SampleMutableFlow : AppCompatActivity() {
         _binding.btnCollect.setOnClickListener {
             val flow = _store.get("") { MutableStateFlow(0) }
             collectFlow(flow)
-            logMsg { "flow subscriptionCount:${flow.subscriptionCount}" }
         }
 
         _binding.btnCancel.setOnClickListener {
