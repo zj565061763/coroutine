@@ -6,13 +6,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Collections
-import java.util.WeakHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 class FScope(scope: CoroutineScope = MainScope()) {
     private val _scope = scope
-    private val _jobHolder: MutableMap<Job, String> = Collections.synchronizedMap(WeakHashMap())
+    private val _jobHolder: MutableMap<Job, String> = Collections.synchronizedMap(hashMapOf())
 
     /**
      * 启动协程
@@ -27,9 +26,11 @@ class FScope(scope: CoroutineScope = MainScope()) {
             start = start,
             block = block,
         ).also { job ->
-            _jobHolder[job] = ""
             job.invokeOnCompletion {
                 _jobHolder.remove(job)
+            }
+            if (job.isActive) {
+                _jobHolder[job] = ""
             }
         }
     }
