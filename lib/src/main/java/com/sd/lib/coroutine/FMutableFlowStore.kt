@@ -50,7 +50,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         factory: () -> T,
     ): T {
         return factory().also { flow ->
-            launchLocked {
+            launch {
                 delay(1000)
                 val context = currentCoroutineContext()
                 flow.subscriptionCount.collect { count ->
@@ -70,7 +70,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         }
     }
 
-    private fun launchLocked(block: suspend CoroutineScope.() -> Unit): Job {
+    private fun launch(block: suspend CoroutineScope.() -> Unit): Job {
         val scope = _scope ?: MainScope().also {
             _scope = it
         }
