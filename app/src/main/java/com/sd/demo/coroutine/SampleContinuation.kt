@@ -24,12 +24,12 @@ class SampleContinuation : AppCompatActivity() {
 
         _binding.btnResume.setOnClickListener {
             _continuation.resume("hello")
-            logMsg { "FContinuation size:${_continuation.size()}" }
+            logMsg { "size:${_continuation.size()}" }
         }
 
         _binding.btnCancel.setOnClickListener {
             _continuation.cancel()
-            logMsg { "FContinuation size:${_continuation.size()}" }
+            logMsg { "size:${_continuation.size()}" }
         }
     }
 
