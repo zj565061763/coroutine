@@ -8,7 +8,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class FContinuation<T> {
-    private val _holder: MutableList<CancellableContinuation<T>> = Collections.synchronizedList(mutableListOf())
+    private val _holder: MutableSet<CancellableContinuation<T>> = Collections.synchronizedSet(hashSetOf())
 
     suspend fun await(onCancel: CompletionHandler? = null): T {
         return suspendCancellableCoroutine { cont ->
