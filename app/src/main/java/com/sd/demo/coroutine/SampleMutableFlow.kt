@@ -12,7 +12,7 @@ class SampleMutableFlow : AppCompatActivity() {
     private val _binding by lazy { SampleMutableFlowBinding.inflate(layoutInflater) }
 
     private val _scope = FScope()
-    private val _store = FMutableFlowStore<Int, MutableSharedFlow<Int>>()
+    private val _store = FMutableFlowStore<MutableSharedFlow<Int>>()
 
     private val _flow: MutableSharedFlow<Int>
         get() = _store.get("") {

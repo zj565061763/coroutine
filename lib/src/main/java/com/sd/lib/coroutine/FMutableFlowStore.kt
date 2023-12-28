@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class FMutableFlowStore<T, F : MutableSharedFlow<T>> {
+class FMutableFlowStore<F : MutableSharedFlow<*>> {
     private val _flows: MutableMap<String, F> = hashMapOf()
     private var _scope: CoroutineScope? = null
 
