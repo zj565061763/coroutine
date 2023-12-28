@@ -19,10 +19,12 @@ class SampleScope : AppCompatActivity() {
             _scope.launch {
                 start("launch")
             }
+            logMsg { "size:${_scope.size()}" }
         }
 
         _binding.btnCancel.setOnClickListener {
             _scope.cancel()
+            logMsg { "size:${_scope.size()}" }
         }
     }
 
