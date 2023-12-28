@@ -11,7 +11,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 class FScope(scope: CoroutineScope = MainScope()) {
     private val _scope = scope
-    private val _jobHolder: MutableMap<Job, String> = Collections.synchronizedMap(hashMapOf())
+    private val _holder: MutableSet<Job> = Collections.synchronizedSet(hashSetOf())
 
     /**
      * 启动协程
@@ -27,10 +27,10 @@ class FScope(scope: CoroutineScope = MainScope()) {
             block = block,
         ).also { job ->
             job.invokeOnCompletion {
-                _jobHolder.remove(job)
+                _holder.remove(job)
             }
             if (job.isActive) {
-                _jobHolder[job] = ""
+                _holder.add(job)
             }
         }
     }
@@ -39,9 +39,9 @@ class FScope(scope: CoroutineScope = MainScope()) {
      * 取消协程
      */
     fun cancel() {
-        while (_jobHolder.isNotEmpty()) {
-            _jobHolder.keys.toMutableList().forEach { job ->
-                _jobHolder.remove(job)
+        while (_holder.isNotEmpty()) {
+            _holder.toMutableList().forEach { job ->
+                _holder.remove(job)
                 job.cancel()
             }
         }
@@ -51,6 +51,6 @@ class FScope(scope: CoroutineScope = MainScope()) {
      * 通过[launch]启动的存活协程数量
      */
     fun size(): Int {
-        return _jobHolder.size
+        return _holder.size
     }
 }
