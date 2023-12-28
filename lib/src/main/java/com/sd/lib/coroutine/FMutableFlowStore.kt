@@ -9,8 +9,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class FMutableFlowStore<F : MutableSharedFlow<*>> {
-    private val _flows: MutableMap<String, F> = hashMapOf()
+class FMutableFlowStore<T : MutableSharedFlow<*>> {
+    private val _flows: MutableMap<String, T> = hashMapOf()
     private var _scope: CoroutineScope? = null
 
     /**
@@ -18,8 +18,8 @@ class FMutableFlowStore<F : MutableSharedFlow<*>> {
      */
     fun get(
         key: String,
-        factory: () -> F,
-    ): F {
+        factory: () -> T,
+    ): T {
         synchronized(this@FMutableFlowStore) {
             return _flows.getOrPut(key) { createFlowLocked(key, factory) }
         }
@@ -47,8 +47,8 @@ class FMutableFlowStore<F : MutableSharedFlow<*>> {
 
     private fun createFlowLocked(
         key: String,
-        factory: () -> F,
-    ): F {
+        factory: () -> T,
+    ): T {
         return factory().also { flow ->
             launchLocked {
                 delay(1000)
