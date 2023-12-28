@@ -8,16 +8,16 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class FContinuation<T> {
-    private val _continuationHolder: MutableList<CancellableContinuation<T>> = Collections.synchronizedList(mutableListOf())
+    private val _holder: MutableList<CancellableContinuation<T>> = Collections.synchronizedList(mutableListOf())
 
     suspend fun await(onCancel: CompletionHandler? = null): T {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation {
-                _continuationHolder.remove(cont)
+                _holder.remove(cont)
                 onCancel?.invoke(it)
             }
             if (cont.isActive) {
-                _continuationHolder.add(cont)
+                _holder.add(cont)
             }
         }
     }
@@ -41,20 +41,20 @@ class FContinuation<T> {
     }
 
     fun size(): Int {
-        return _continuationHolder.size
+        return _holder.size
     }
 
     private fun foreach(
         remove: Boolean = true,
         block: (CancellableContinuation<T>) -> Unit,
     ) {
-        while (_continuationHolder.isNotEmpty()) {
-            _continuationHolder.toMutableList().forEach {
+        while (_holder.isNotEmpty()) {
+            _holder.toMutableList().forEach {
                 try {
                     block(it)
                 } finally {
                     if (remove) {
-                        _continuationHolder.remove(it)
+                        _holder.remove(it)
                     }
                 }
             }
