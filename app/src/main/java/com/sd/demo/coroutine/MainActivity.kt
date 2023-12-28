@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         _binding.btnSampleMutableFlow.setOnClickListener {
-            startActivity(Intent(this, SampleMutableFlow::class.java))
+            startActivity(Intent(this, SampleMutableFlowStore::class.java))
         }
     }
 }

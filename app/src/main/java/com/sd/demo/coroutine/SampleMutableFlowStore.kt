@@ -2,14 +2,14 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.coroutine.databinding.SampleMutableFlowBinding
+import com.sd.demo.coroutine.databinding.SampleMutableFlowStoreBinding
 import com.sd.lib.coroutine.FMutableFlowStore
 import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class SampleMutableFlow : AppCompatActivity() {
-    private val _binding by lazy { SampleMutableFlowBinding.inflate(layoutInflater) }
+class SampleMutableFlowStore : AppCompatActivity() {
+    private val _binding by lazy { SampleMutableFlowStoreBinding.inflate(layoutInflater) }
 
     private val _scope = FScope()
     private val _store = FMutableFlowStore<MutableSharedFlow<Int>>()
