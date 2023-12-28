@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class FMutableFlow<T, F : MutableSharedFlow<T>> {
+class FMutableFlowStore<T, F : MutableSharedFlow<T>> {
     private val _flows: MutableMap<String, F> = hashMapOf()
     private var _scope: CoroutineScope? = null
 
@@ -20,7 +20,7 @@ class FMutableFlow<T, F : MutableSharedFlow<T>> {
         key: String,
         factory: () -> F,
     ): F {
-        synchronized(this@FMutableFlow) {
+        synchronized(this@FMutableFlowStore) {
             return _flows.getOrPut(key) { createFlowLocked(key, factory) }
         }
     }
@@ -29,7 +29,7 @@ class FMutableFlow<T, F : MutableSharedFlow<T>> {
      * 清空所有保存的[MutableSharedFlow]
      */
     fun clear() {
-        synchronized(this@FMutableFlow) {
+        synchronized(this@FMutableFlowStore) {
             _flows.clear()
             _scope?.cancel()
             _scope = null
@@ -40,7 +40,7 @@ class FMutableFlow<T, F : MutableSharedFlow<T>> {
      * 当前保存的[MutableSharedFlow]数量
      */
     fun size(): Int {
-        synchronized(this@FMutableFlow) {
+        synchronized(this@FMutableFlowStore) {
             return _flows.size
         }
     }
@@ -62,7 +62,7 @@ class FMutableFlow<T, F : MutableSharedFlow<T>> {
                 }
             }.let { job ->
                 job.invokeOnCompletion {
-                    synchronized(this@FMutableFlow) {
+                    synchronized(this@FMutableFlowStore) {
                         _flows.remove(key)
                     }
                 }

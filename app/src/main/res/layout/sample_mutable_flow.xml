@@ -6,31 +6,24 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_sample_scope"
+        android:id="@+id/btn_collect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SampleScope"
+        android:text="collect"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_sample_mutator"
+        android:id="@+id/btn_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SampleMutator"
+        android:text="cancel"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_sample_continuation"
+        android:id="@+id/btn_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SampleContinuation"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btn_sample_mutable_flow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SampleMutableFlow"
+        android:text="log"
         android:textAllCaps="false" />
 
 </LinearLayout>

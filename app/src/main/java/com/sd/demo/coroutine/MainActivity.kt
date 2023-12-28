@@ -24,6 +24,10 @@ class MainActivity : AppCompatActivity() {
         _binding.btnSampleContinuation.setOnClickListener {
             startActivity(Intent(this, SampleContinuation::class.java))
         }
+
+        _binding.btnSampleMutableFlow.setOnClickListener {
+            startActivity(Intent(this, SampleMutableFlow::class.java))
+        }
     }
 }
 
