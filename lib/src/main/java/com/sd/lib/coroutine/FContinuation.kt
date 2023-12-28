@@ -49,14 +49,9 @@ class FContinuation<T> {
         block: (CancellableContinuation<T>) -> Unit,
     ) {
         while (_holder.isNotEmpty()) {
-            _holder.toMutableList().forEach {
-                try {
-                    block(it)
-                } finally {
-                    if (remove) {
-                        _holder.remove(it)
-                    }
-                }
+            _holder.toMutableList().forEach { cont ->
+                if (remove) _holder.remove(cont)
+                block(cont)
             }
         }
     }
