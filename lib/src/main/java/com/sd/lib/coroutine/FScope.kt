@@ -40,7 +40,7 @@ class FScope(scope: CoroutineScope = MainScope()) {
      */
     fun cancel() {
         while (_holder.isNotEmpty()) {
-            _holder.toMutableList().forEach { job ->
+            _holder.toTypedArray().forEach { job ->
                 _holder.remove(job)
                 job.cancel()
             }
