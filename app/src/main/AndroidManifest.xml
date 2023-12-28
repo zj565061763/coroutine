@@ -22,9 +22,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SampleMutatorActivity" />
-        <activity android:name=".SampleScopeActivity" />
-        <activity android:name=".SampleContinuationActivity" />
+        <activity android:name=".SampleMutator" />
+        <activity android:name=".SampleScope" />
+        <activity android:name=".SampleContinuation" />
 
     </application>
 

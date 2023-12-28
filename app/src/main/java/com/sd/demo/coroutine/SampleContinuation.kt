@@ -2,13 +2,13 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.coroutine.databinding.ActivitySampleContinuationBinding
+import com.sd.demo.coroutine.databinding.SampleContinuationBinding
 import com.sd.lib.coroutine.FContinuation
 import com.sd.lib.coroutine.FScope
 import java.util.UUID
 
-class SampleContinuationActivity : AppCompatActivity() {
-    private val _binding by lazy { ActivitySampleContinuationBinding.inflate(layoutInflater) }
+class SampleContinuation : AppCompatActivity() {
+    private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
     private val _scope = FScope()
     private val _continuation = FContinuation<String>()
 

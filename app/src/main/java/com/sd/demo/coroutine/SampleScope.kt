@@ -2,41 +2,27 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sd.demo.coroutine.databinding.ActivitySampleMutatorBinding
-import com.sd.lib.coroutine.FMutator
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import com.sd.demo.coroutine.databinding.SampleScopeBinding
+import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.UUID
 
-class SampleMutatorActivity : AppCompatActivity() {
-    private val _binding by lazy { ActivitySampleMutatorBinding.inflate(layoutInflater) }
-    private val _scope = MainScope()
-    private val _mutator = FMutator()
+class SampleScope : AppCompatActivity() {
+    private val _binding by lazy { SampleScopeBinding.inflate(layoutInflater) }
+    private val _scope = FScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
 
-        _binding.btnMutate1.setOnClickListener {
+        _binding.btnLaunch.setOnClickListener {
             _scope.launch {
-                _mutator.mutate {
-                    start("mutate_1")
-                }
-            }
-        }
-
-        _binding.btnMutate2.setOnClickListener {
-            _scope.launch {
-                _mutator.mutate(priority = 1) {
-                    start("mutate_2")
-                }
+                start("launch")
             }
         }
 
         _binding.btnCancel.setOnClickListener {
-            _mutator.cancel()
+            _scope.cancel()
         }
     }
 

@@ -6,24 +6,24 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_scope"
+        android:id="@+id/btn_sample_scope"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="scope"
+        android:text="SampleScope"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_mutator"
+        android:id="@+id/btn_sample_mutator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="mutator"
+        android:text="SampleMutator"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_continuation"
+        android:id="@+id/btn_sample_continuation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="continuation"
+        android:text="SampleContinuation"
         android:textAllCaps="false" />
 
 </LinearLayout>

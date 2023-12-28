@@ -13,14 +13,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
 
-        _binding.btnScope.setOnClickListener {
-            startActivity(Intent(this, SampleScopeActivity::class.java))
+        _binding.btnSampleScope.setOnClickListener {
+            startActivity(Intent(this, SampleScope::class.java))
         }
-        _binding.btnMutator.setOnClickListener {
-            startActivity(Intent(this, SampleMutatorActivity::class.java))
+
+        _binding.btnSampleMutator.setOnClickListener {
+            startActivity(Intent(this, SampleMutator::class.java))
         }
-        _binding.btnContinuation.setOnClickListener {
-            startActivity(Intent(this, SampleContinuationActivity::class.java))
+
+        _binding.btnSampleContinuation.setOnClickListener {
+            startActivity(Intent(this, SampleContinuation::class.java))
         }
     }
 }
