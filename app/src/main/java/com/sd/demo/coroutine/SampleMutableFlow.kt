@@ -6,25 +6,33 @@ import com.sd.demo.coroutine.databinding.SampleMutableFlowBinding
 import com.sd.lib.coroutine.FMutableFlowStore
 import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class SampleMutableFlow : AppCompatActivity() {
     private val _binding by lazy { SampleMutableFlowBinding.inflate(layoutInflater) }
 
     private val _scope = FScope()
-    private val _store = FMutableFlowStore<Int, MutableStateFlow<Int>>()
+    private val _store = FMutableFlowStore<Int, MutableSharedFlow<Int>>()
+
+    private val _flow: MutableSharedFlow<Int>
+        get() = _store.get("") {
+            MutableSharedFlow<Int>(replay = 1).apply { tryEmit(1) }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
 
         _binding.btnCollect.setOnClickListener {
-            val flow = _store.get("") { MutableStateFlow(0) }
-            collectFlow(flow)
+            collectFlow(_flow)
         }
 
-        _binding.btnCancel.setOnClickListener {
+        _binding.btnCancelCollect.setOnClickListener {
             _scope.cancel()
+        }
+
+        _binding.btnEmit.setOnClickListener {
+            _flow.tryEmit(0)
         }
 
         _binding.btnLog.setOnClickListener {
