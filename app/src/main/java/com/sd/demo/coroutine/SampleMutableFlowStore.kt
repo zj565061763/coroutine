@@ -35,10 +35,6 @@ class SampleMutableFlowStore : AppCompatActivity() {
             _flow.tryEmit(0)
         }
 
-        _binding.btnClearStore.setOnClickListener {
-            _store.clear()
-        }
-
         _binding.btnLog.setOnClickListener {
             logMsg { "store size:${_store.size()} collect size:${_scope.size()}" }
         }

@@ -26,17 +26,6 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
     }
 
     /**
-     * 清空所有保存的[MutableSharedFlow]
-     */
-    fun clear() {
-        synchronized(this@FMutableFlowStore) {
-            _flows.clear()
-            _scope?.cancel()
-            _scope = null
-        }
-    }
-
-    /**
      * 当前保存的[MutableSharedFlow]数量
      */
     fun size(): Int {
