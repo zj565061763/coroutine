@@ -17,7 +17,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
      * 获取[key]对应的[MutableSharedFlow]，如果不存在则调用[factory]创建并保存，
      * 当[MutableSharedFlow.subscriptionCount]等于0时，会移除该对象
      */
-    fun get(
+    fun getOrPut(
         key: Any,
         factory: () -> T,
     ): T {

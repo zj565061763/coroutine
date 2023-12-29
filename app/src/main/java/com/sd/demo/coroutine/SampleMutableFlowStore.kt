@@ -15,7 +15,7 @@ class SampleMutableFlowStore : AppCompatActivity() {
     private val _store = FMutableFlowStore<MutableSharedFlow<Int>>()
 
     private val _flow: MutableSharedFlow<Int>
-        get() = _store.get("") {
+        get() = _store.getOrPut("") {
             MutableSharedFlow<Int>(replay = 1).apply { tryEmit(1) }
         }
 
