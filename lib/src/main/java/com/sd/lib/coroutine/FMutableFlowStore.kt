@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class FMutableFlowStore<T : MutableSharedFlow<*>> {
-    private val _flows: MutableMap<Any, T> = hashMapOf()
+    private val _holder: MutableMap<Any, T> = hashMapOf()
     private var _scope: CoroutineScope? = null
 
     /**
@@ -18,7 +18,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
      */
     fun get(key: Any): T? {
         synchronized(this@FMutableFlowStore) {
-            return _flows[key]
+            return _holder[key]
         }
     }
 
@@ -31,7 +31,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         factory: () -> T,
     ): T {
         synchronized(this@FMutableFlowStore) {
-            return _flows.getOrPut(key) { createFlowLocked(key, factory) }
+            return _holder.getOrPut(key) { createFlowLocked(key, factory) }
         }
     }
 
@@ -40,7 +40,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
      */
     fun size(): Int {
         synchronized(this@FMutableFlowStore) {
-            return _flows.size
+            return _holder.size
         }
     }
 
@@ -62,7 +62,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
             }.let { job ->
                 job.invokeOnCompletion {
                     synchronized(this@FMutableFlowStore) {
-                        _flows.remove(key)
+                        _holder.remove(key)
                     }
                 }
             }
