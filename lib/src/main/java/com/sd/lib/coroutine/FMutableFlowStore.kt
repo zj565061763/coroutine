@@ -14,6 +14,15 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
     private var _scope: CoroutineScope? = null
 
     /**
+     * 获取[key]对应的[MutableSharedFlow]
+     */
+    fun get(key: Any): T? {
+        synchronized(this@FMutableFlowStore) {
+            return _flows[key]
+        }
+    }
+
+    /**
      * 获取[key]对应的[MutableSharedFlow]，如果不存在则调用[factory]创建并保存，
      * 当[MutableSharedFlow.subscriptionCount]等于0时，会移除该对象
      */
