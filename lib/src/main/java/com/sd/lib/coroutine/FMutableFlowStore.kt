@@ -70,9 +70,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
     }
 
     private fun launch(block: suspend CoroutineScope.() -> Unit): Job {
-        val scope = _scope ?: MainScope().also {
-            _scope = it
-        }
+        val scope = _scope ?: MainScope().also { _scope = it }
         return scope.launch(block = block)
     }
 }
