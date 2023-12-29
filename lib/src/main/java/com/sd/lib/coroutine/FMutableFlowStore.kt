@@ -14,7 +14,8 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
     private var _scope: CoroutineScope? = null
 
     /**
-     * 获取[key]对应的[MutableSharedFlow]，当[MutableSharedFlow.subscriptionCount]等于0时，会移除该Flow
+     * 获取[key]对应的[MutableSharedFlow]，如果不存在则调用[factory]创建并保存，
+     * 当[MutableSharedFlow.subscriptionCount]等于0时，会移除该对象
      */
     fun get(
         key: Any,
