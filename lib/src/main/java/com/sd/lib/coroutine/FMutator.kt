@@ -64,10 +64,6 @@ class FMutator {
 
     //-------------------- ext --------------------
 
-    suspend fun <T> withLock(action: suspend () -> T) = mutex.withLock {
-        action()
-    }
-
     fun cancel() {
         while (true) {
             val mutator = currentMutator.get() ?: return
