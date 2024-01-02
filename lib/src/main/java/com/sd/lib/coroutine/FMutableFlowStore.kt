@@ -1,7 +1,5 @@
 package com.sd.lib.coroutine
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
@@ -11,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class FMutableFlowStore<T : MutableSharedFlow<*>> {
     private val _holder: MutableMap<Any, T> = hashMapOf()
-    private var _scope: CoroutineScope? = null
+    private val _scope = MainScope()
 
     /**
      * 获取[key]对应的[MutableSharedFlow]
@@ -49,7 +47,7 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         factory: () -> T,
     ): T {
         return factory().also { flow ->
-            launch {
+            _scope.launch {
                 delay(1000)
                 val context = currentCoroutineContext()
                 flow.subscriptionCount.collect { count ->
@@ -67,10 +65,5 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
                 }
             }
         }
-    }
-
-    private fun launch(block: suspend CoroutineScope.() -> Unit): Job {
-        val scope = _scope ?: MainScope().also { _scope = it }
-        return scope.launch(block = block)
     }
 }
