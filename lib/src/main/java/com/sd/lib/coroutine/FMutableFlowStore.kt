@@ -29,7 +29,9 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         factory: () -> T,
     ): T {
         synchronized(this@FMutableFlowStore) {
-            return _holder.getOrPut(key) { createFlowLocked(key, factory) }
+            return _holder.getOrPut(key) {
+                factory().also { initFlow(key, it) }
+            }
         }
     }
 
@@ -42,26 +44,21 @@ class FMutableFlowStore<T : MutableSharedFlow<*>> {
         }
     }
 
-    private fun createFlowLocked(
-        key: Any,
-        factory: () -> T,
-    ): T {
-        return factory().also { flow ->
-            _scope.launch {
-                delay(1000)
-                val context = currentCoroutineContext()
-                flow.subscriptionCount.collect { count ->
-                    if (count > 0) {
-                        // active
-                    } else {
-                        context.cancel()
-                    }
+    private fun initFlow(key: Any, flow: T) {
+        _scope.launch {
+            delay(1000)
+            val context = currentCoroutineContext()
+            flow.subscriptionCount.collect { count ->
+                if (count > 0) {
+                    // active
+                } else {
+                    context.cancel()
                 }
-            }.let { job ->
-                job.invokeOnCompletion {
-                    synchronized(this@FMutableFlowStore) {
-                        _holder.remove(key)
-                    }
+            }
+        }.let { job ->
+            job.invokeOnCompletion {
+                synchronized(this@FMutableFlowStore) {
+                    _holder.remove(key)
                 }
             }
         }
