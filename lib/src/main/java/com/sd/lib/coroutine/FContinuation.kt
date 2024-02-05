@@ -35,7 +35,7 @@ class FContinuation<T> {
     }
 
     fun cancel(cause: Throwable? = null) {
-        foreach(remove = false) {
+        foreach {
             it.cancel(cause)
         }
     }
@@ -44,15 +44,10 @@ class FContinuation<T> {
         return _holder.size
     }
 
-    private fun foreach(
-        remove: Boolean = true,
-        block: (CancellableContinuation<T>) -> Unit,
-    ) {
+    private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
         while (_holder.isNotEmpty()) {
             _holder.toTypedArray().forEach { cont ->
-                if (remove) {
-                    _holder.remove(cont)
-                }
+                _holder.remove(cont)
                 block(cont)
             }
         }
