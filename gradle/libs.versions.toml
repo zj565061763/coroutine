@@ -10,7 +10,7 @@ kotlin = "1.9.22"
 [libraries]
 
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
-kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
 
 androidx-test-ext-junit = "androidx.test.ext:junit:1.1.5"
 androidx-test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
