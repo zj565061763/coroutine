@@ -30,17 +30,16 @@ class SampleContinuation : AppCompatActivity() {
 
     private suspend fun start(tag: String) {
         val uuid = UUID.randomUUID().toString()
-        logMsg { "$tag before $uuid" }
+        logMsg { "$tag start $uuid" }
 
-        try {
-            val result = _continuation.await()
-            logMsg { "$tag result:$result $uuid" }
+        val result = try {
+            _continuation.await()
         } catch (e: Exception) {
             logMsg { "$tag Exception:$e $uuid" }
             throw e
         }
 
-        logMsg { "$tag after $uuid" }
+        logMsg { "$tag finish ($result) $uuid" }
     }
 
     override fun onDestroy() {
