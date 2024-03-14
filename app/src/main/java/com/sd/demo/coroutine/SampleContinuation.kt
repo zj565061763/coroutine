@@ -15,10 +15,8 @@ class SampleContinuation : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-        _binding.btnAwait.setOnClickListener {
-            _scope.launch {
-                start("launch")
-            }
+        _binding.btnLaunch.setOnClickListener {
+            _scope.launch { start("launch") }
         }
         _binding.btnResume.setOnClickListener {
             _continuation.resume("hello")
