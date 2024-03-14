@@ -12,12 +12,10 @@ class FContinuation<T> {
 
     suspend fun await(onCancel: CompletionHandler? = null): T {
         return suspendCancellableCoroutine { cont ->
+            _holder.add(cont)
             cont.invokeOnCancellation {
                 _holder.remove(cont)
                 onCancel?.invoke(it)
-            }
-            if (cont.isActive) {
-                _holder.add(cont)
             }
         }
     }
