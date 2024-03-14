@@ -18,7 +18,6 @@ class SampleMutator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-
         _binding.btnMutate1.setOnClickListener {
             _scope.launch {
                 _mutator.mutate {
@@ -26,7 +25,6 @@ class SampleMutator : AppCompatActivity() {
                 }
             }
         }
-
         _binding.btnMutate2.setOnClickListener {
             _scope.launch {
                 _mutator.mutate(priority = 1) {
@@ -34,7 +32,6 @@ class SampleMutator : AppCompatActivity() {
                 }
             }
         }
-
         _binding.btnCancel.setOnClickListener {
             _mutator.cancel()
         }

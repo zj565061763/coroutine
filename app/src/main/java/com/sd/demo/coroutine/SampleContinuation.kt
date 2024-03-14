@@ -15,18 +15,15 @@ class SampleContinuation : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-
         _binding.btnAwait.setOnClickListener {
             _scope.launch {
                 start("launch")
             }
         }
-
         _binding.btnResume.setOnClickListener {
             _continuation.resume("hello")
             logMsg { "size:${_continuation.size()}" }
         }
-
         _binding.btnCancel.setOnClickListener {
             _continuation.cancel()
             logMsg { "size:${_continuation.size()}" }
