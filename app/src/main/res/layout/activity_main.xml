@@ -6,28 +6,28 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_sample_scope"
+        android:id="@+id/btn_SampleScope"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SampleScope"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_sample_mutator"
+        android:id="@+id/btn_SampleMutator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SampleMutator"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_sample_continuation"
+        android:id="@+id/btn_SampleContinuation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SampleContinuation"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_sample_mutable_flow_store"
+        android:id="@+id/btn_SampleMutableFlowStore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SampleMutableFlowStore"
