@@ -12,19 +12,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-
         _binding.btnSampleScope.setOnClickListener {
             startActivity(Intent(this, SampleScope::class.java))
         }
-
         _binding.btnSampleMutator.setOnClickListener {
             startActivity(Intent(this, SampleMutator::class.java))
         }
-
         _binding.btnSampleContinuation.setOnClickListener {
             startActivity(Intent(this, SampleContinuation::class.java))
         }
-
         _binding.btnSampleMutableFlowStore.setOnClickListener {
             startActivity(Intent(this, SampleMutableFlowStore::class.java))
         }
