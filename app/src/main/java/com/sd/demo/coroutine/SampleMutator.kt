@@ -45,7 +45,7 @@ class SampleMutator : AppCompatActivity() {
         logMsg { "$tag delay before $uuid" }
 
         try {
-            delay(5000)
+            delay(10_000)
         } catch (e: Exception) {
             logMsg { "$tag delay Exception:$e $uuid" }
             throw e
