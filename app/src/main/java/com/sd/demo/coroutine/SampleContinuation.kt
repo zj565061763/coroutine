@@ -22,8 +22,12 @@ class SampleContinuation : AppCompatActivity() {
             _continuation.resume("hello")
             logMsg { "size:${_continuation.size()}" }
         }
-        _binding.btnCancel.setOnClickListener {
+        _binding.btnCancelContinuation.setOnClickListener {
             _continuation.cancel()
+            logMsg { "size:${_continuation.size()}" }
+        }
+        _binding.btnCancelLaunch.setOnClickListener {
+            _scope.cancel()
             logMsg { "size:${_continuation.size()}" }
         }
     }
