@@ -26,11 +26,9 @@ class FScope(scope: CoroutineScope = MainScope()) {
             start = start,
             block = block,
         ).also { job ->
+            _holder.add(job)
             job.invokeOnCompletion {
                 _holder.remove(job)
-            }
-            if (job.isActive) {
-                _holder.add(job)
             }
         }
     }
