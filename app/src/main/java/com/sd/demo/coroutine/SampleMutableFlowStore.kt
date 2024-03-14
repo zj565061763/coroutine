@@ -6,6 +6,7 @@ import com.sd.demo.coroutine.databinding.SampleMutableFlowStoreBinding
 import com.sd.lib.coroutine.FMutableFlowStore
 import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SampleMutableFlowStore : AppCompatActivity() {
     private val _binding by lazy { SampleMutableFlowStoreBinding.inflate(layoutInflater) }
@@ -22,6 +23,7 @@ class SampleMutableFlowStore : AppCompatActivity() {
             collectFlow()
         }
         _binding.btnCancelCollect.setOnClickListener {
+            logMsg { "click cancel" }
             _scope.cancel()
         }
         _binding.btnEmit.setOnClickListener {
@@ -33,9 +35,7 @@ class SampleMutableFlowStore : AppCompatActivity() {
     }
 
     private fun collectFlow() {
-        val flow = _store.getOrPut("") {
-            MutableSharedFlow<Int>(replay = 1).apply { tryEmit(1) }
-        }
+        val flow = _store.getOrPut("") { MutableStateFlow(0) }
         _scope.launch {
             flow.collect {
                 logMsg { "collect $it" }
