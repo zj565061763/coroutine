@@ -21,6 +21,7 @@ class SampleMutator : AppCompatActivity() {
         setContentView(_binding.root)
         _binding.btnMutate1.setOnClickListener {
             _scope.launch {
+                logMsg { "click mutate_1" }
                 _mutator.mutate {
                     start("mutate_1")
                 }
@@ -28,12 +29,14 @@ class SampleMutator : AppCompatActivity() {
         }
         _binding.btnMutate2.setOnClickListener {
             _scope.launch {
+                logMsg { "click mutate_2" }
                 _mutator.mutate(priority = 1) {
                     start("mutate_2")
                 }
             }
         }
         _binding.btnCancel.setOnClickListener {
+            logMsg { "click cancel" }
             _mutator.cancel()
         }
     }
