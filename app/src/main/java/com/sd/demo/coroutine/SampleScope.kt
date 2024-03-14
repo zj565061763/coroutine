@@ -36,7 +36,6 @@ class SampleScope : AppCompatActivity() {
             delay(5000)
         } catch (e: Exception) {
             logMsg { "$tag delay Exception:$e $uuid" }
-            e.printStackTrace()
             throw e
         }
 
