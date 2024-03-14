@@ -40,16 +40,16 @@ class SampleMutator : AppCompatActivity() {
 
     private suspend fun start(tag: String) {
         val uuid = UUID.randomUUID().toString()
-        logMsg { "$tag delay before $uuid" }
+        logMsg { "$tag start $uuid" }
 
         try {
             delay(10_000)
         } catch (e: Exception) {
-            logMsg { "$tag delay Exception:$e $uuid" }
+            logMsg { "$tag Exception:$e $uuid" }
             throw e
         }
 
-        logMsg { "$tag delay after $uuid" }
+        logMsg { "$tag finish $uuid" }
     }
 
     override fun onDestroy() {
