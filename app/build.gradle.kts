@@ -7,7 +7,7 @@ android {
     namespace ="com.sd.demo.coroutine"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
-        minSdk = libs.versions.androidMinSdk.get().toInt()
+        minSdk = 21
         targetSdk = libs.versions.androidTargetSdk.get().toInt()
         applicationId ="com.sd.demo.coroutine"
         versionCode= 1
