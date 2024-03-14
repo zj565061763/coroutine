@@ -42,7 +42,6 @@ class SampleContinuation : AppCompatActivity() {
             logMsg { "$tag result:$result $uuid" }
         } catch (e: Exception) {
             logMsg { "$tag Exception:$e $uuid" }
-            e.printStackTrace()
             throw e
         }
 
