@@ -13,8 +13,8 @@ import java.util.UUID
 class SampleMutator : AppCompatActivity() {
     private val _binding by lazy { SampleMutatorBinding.inflate(layoutInflater) }
 
-    private val _scope = MainScope()
     private val _mutator = FMutator()
+    private val _scope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -10,8 +10,8 @@ import java.util.UUID
 class SampleContinuation : AppCompatActivity() {
     private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope()
     private val _continuation = FContinuation<String>()
+    private val _scope = FScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
