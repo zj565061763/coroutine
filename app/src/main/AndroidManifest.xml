@@ -25,7 +25,6 @@
         <activity android:name=".SampleMutator" />
         <activity android:name=".SampleScope" />
         <activity android:name=".SampleContinuation" />
-        <activity android:name=".SampleMutableFlowStore" />
 
     </application>
 
