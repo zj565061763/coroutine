@@ -31,7 +31,7 @@ kotlin {
 }
 
 dependencies {
-    api(libs.kotlin.coroutines)
+    api(libs.kotlinx.coroutines)
 }
 
 publishing {
