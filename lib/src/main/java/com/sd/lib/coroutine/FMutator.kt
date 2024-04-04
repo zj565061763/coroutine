@@ -27,7 +27,7 @@ class FMutator {
     private class Mutator(val priority: Int, val job: Job) {
         fun canInterrupt(other: Mutator) = priority >= other.priority
 
-        fun cancel() = job.cancel()
+        fun cancel() = job.cancel(MutationInterruptedException())
     }
 
     private val currentMutator = AtomicReference<Mutator?>(null)
@@ -72,5 +72,13 @@ class FMutator {
                 break
             }
         }
+    }
+}
+
+private class MutationInterruptedException : CancellationException("Mutation interrupted") {
+    override fun fillInStackTrace(): Throwable {
+        // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
+        stackTrace = emptyArray()
+        return this
     }
 }
