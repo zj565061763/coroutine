@@ -13,8 +13,8 @@ class SampleContinuation : AppCompatActivity() {
     private val _scope = FScope()
 
     private val _continuation = object : FContinuation<String>() {
-        override suspend fun onSizeChange(oldSize: Int, newSize: Int) {
-            logMsg { "onSizeChange ($oldSize -> $newSize)" }
+        override fun onSizeChange(oldSize: Int, newSize: Int) {
+            logMsg { "onSizeChange ($oldSize -> $newSize) ${Thread.currentThread().name}" }
         }
     }
 
