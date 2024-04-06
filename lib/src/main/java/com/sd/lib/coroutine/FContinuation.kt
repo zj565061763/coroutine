@@ -14,8 +14,11 @@ class FContinuation<T> {
         return suspendCancellableCoroutine { cont ->
             _holder.add(cont)
             cont.invokeOnCancellation {
-                _holder.remove(cont)
-                onCancel?.invoke(it)
+                try {
+                    onCancel?.invoke(it)
+                } finally {
+                    _holder.remove(cont)
+                }
             }
         }
     }
