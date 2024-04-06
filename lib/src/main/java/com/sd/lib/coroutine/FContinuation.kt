@@ -2,16 +2,12 @@ package com.sd.lib.coroutine
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CompletionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 open class FContinuation<T> {
     private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
-    private val _scope: CoroutineScope = MainScope()
 
     suspend fun await(onCancel: CompletionHandler? = null): T {
         return suspendCancellableCoroutine { cont ->
@@ -48,8 +44,7 @@ open class FContinuation<T> {
     private fun addContinuation(cont: CancellableContinuation<T>) {
         val oldSize = _holder.size
         if (_holder.add(cont)) {
-            val newSize = _holder.size
-            _scope.launch { onSizeChange(oldSize, newSize) }
+            onSizeChange(oldSize, _holder.size)
         }
     }
 
@@ -57,8 +52,7 @@ open class FContinuation<T> {
     private fun removeContinuation(cont: CancellableContinuation<T>) {
         val oldSize = _holder.size
         if (_holder.remove(cont)) {
-            val newSize = _holder.size
-            _scope.launch { onSizeChange(oldSize, newSize) }
+            onSizeChange(oldSize, _holder.size)
         }
     }
 
@@ -73,7 +67,7 @@ open class FContinuation<T> {
     }
 
     /**
-     * 主线程回调
+     * 数量变化回调
      */
-    protected open suspend fun onSizeChange(oldSize: Int, newSize: Int) = Unit
+    protected open fun onSizeChange(oldSize: Int, newSize: Int) = Unit
 }
