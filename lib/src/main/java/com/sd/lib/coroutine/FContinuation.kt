@@ -44,16 +44,13 @@ open class FContinuation<T> {
     private fun addContinuation(cont: CancellableContinuation<T>) {
         val oldSize = _holder.size
         if (_holder.add(cont)) {
-            onSizeChange(oldSize, _holder.size)
+            if (oldSize == 0) onFirstAwait()
         }
     }
 
     @Synchronized
     private fun removeContinuation(cont: CancellableContinuation<T>) {
-        val oldSize = _holder.size
-        if (_holder.remove(cont)) {
-            onSizeChange(oldSize, _holder.size)
-        }
+        _holder.remove(cont)
     }
 
     @Synchronized
@@ -67,7 +64,7 @@ open class FContinuation<T> {
     }
 
     /**
-     * 数量变化回调
+     * [await]的数量从0到1时触发
      */
-    protected open fun onSizeChange(oldSize: Int, newSize: Int) = Unit
+    protected open fun onFirstAwait() = Unit
 }

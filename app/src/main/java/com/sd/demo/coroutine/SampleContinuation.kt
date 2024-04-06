@@ -14,8 +14,8 @@ class SampleContinuation : AppCompatActivity() {
     private val _scope = FScope()
 
     private val _continuation = object : FContinuation<String>() {
-        override fun onSizeChange(oldSize: Int, newSize: Int) {
-            logMsg { "onSizeChange ($oldSize -> $newSize) ${Thread.currentThread().name}" }
+        override fun onFirstAwait() {
+            logMsg { "onFirstAwait ${Thread.currentThread().name}" }
         }
     }
 
