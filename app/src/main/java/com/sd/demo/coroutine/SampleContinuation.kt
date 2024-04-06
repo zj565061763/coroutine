@@ -10,8 +10,13 @@ import java.util.UUID
 class SampleContinuation : AppCompatActivity() {
     private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
 
-    private val _continuation = FContinuation<String>()
     private val _scope = FScope()
+
+    private val _continuation = object : FContinuation<String>() {
+        override suspend fun onSizeChange(oldSize: Int, newSize: Int) {
+            logMsg { "onSizeChange ($oldSize -> $newSize)" }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,16 +25,16 @@ class SampleContinuation : AppCompatActivity() {
             _scope.launch { start("launch") }
         }
         _binding.btnResume.setOnClickListener {
+            logMsg { "click resume" }
             _continuation.resume("hello")
-            logMsg { "resume size:${_continuation.size()}" }
         }
         _binding.btnCancelContinuation.setOnClickListener {
+            logMsg { "click cancel continuation" }
             _continuation.cancel()
-            logMsg { "cancel continuation size:${_continuation.size()}" }
         }
         _binding.btnCancelLaunch.setOnClickListener {
+            logMsg { "click cancel launch" }
             _scope.cancel()
-            logMsg { "cancel launch size:${_continuation.size()}" }
         }
     }
 

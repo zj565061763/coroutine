@@ -2,22 +2,26 @@ package com.sd.lib.coroutine
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CompletionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class FContinuation<T> {
-    private val _holder: MutableSet<CancellableContinuation<T>> = Collections.synchronizedSet(hashSetOf())
+open class FContinuation<T>(
+    private val scope: CoroutineScope = MainScope()
+) {
+    private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
     suspend fun await(onCancel: CompletionHandler? = null): T {
         return suspendCancellableCoroutine { cont ->
-            _holder.add(cont)
+            addContinuation(cont)
             cont.invokeOnCancellation {
                 try {
                     onCancel?.invoke(it)
                 } finally {
-                    _holder.remove(cont)
+                    removeContinuation(cont)
                 }
             }
         }
@@ -41,16 +45,36 @@ class FContinuation<T> {
         }
     }
 
-    fun size(): Int {
-        return _holder.size
+    @Synchronized
+    private fun addContinuation(cont: CancellableContinuation<T>) {
+        val oldSize = _holder.size
+        if (_holder.add(cont)) {
+            val newSize = _holder.size
+            scope.launch { onSizeChange(oldSize, newSize) }
+        }
     }
 
+    @Synchronized
+    private fun removeContinuation(cont: CancellableContinuation<T>) {
+        val oldSize = _holder.size
+        if (_holder.remove(cont)) {
+            val newSize = _holder.size
+            scope.launch { onSizeChange(oldSize, newSize) }
+        }
+    }
+
+    @Synchronized
     private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
         while (_holder.isNotEmpty()) {
             _holder.toTypedArray().forEach { cont ->
-                _holder.remove(cont)
                 block(cont)
+                removeContinuation(cont)
             }
         }
     }
+
+    /**
+     * 主线程回调
+     */
+    protected open suspend fun onSizeChange(oldSize: Int, newSize: Int) = Unit
 }
