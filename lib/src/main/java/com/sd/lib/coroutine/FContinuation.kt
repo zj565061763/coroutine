@@ -59,7 +59,7 @@ open class FContinuation<T> {
     }
 
     /**
-     * [await]的数量从0到1时触发
+     * [await]保存的[CancellableContinuation]数量从0到1时触发
      */
     protected open fun onFirstAwait() = Unit
 }
