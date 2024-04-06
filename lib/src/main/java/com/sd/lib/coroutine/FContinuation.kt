@@ -1,7 +1,6 @@
 package com.sd.lib.coroutine
 
 import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -9,15 +8,11 @@ import kotlin.coroutines.resumeWithException
 open class FContinuation<T> {
     private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
-    suspend fun await(onCancel: CompletionHandler? = null): T {
+    suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
             addContinuation(cont)
             cont.invokeOnCancellation {
-                try {
-                    onCancel?.invoke(it)
-                } finally {
-                    removeContinuation(cont)
-                }
+                removeContinuation(cont)
             }
         }
     }
