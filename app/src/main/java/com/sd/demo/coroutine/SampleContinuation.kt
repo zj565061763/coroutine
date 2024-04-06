@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.coroutine.databinding.SampleContinuationBinding
 import com.sd.lib.coroutine.FContinuation
 import com.sd.lib.coroutine.FScope
+import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
 class SampleContinuation : AppCompatActivity() {
@@ -22,7 +23,7 @@ class SampleContinuation : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
         _binding.btnLaunch.setOnClickListener {
-            _scope.launch { start("launch") }
+            _scope.launch(Dispatchers.IO) { start("launch") }
         }
         _binding.btnResume.setOnClickListener {
             logMsg { "click resume" }
