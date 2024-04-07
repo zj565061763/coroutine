@@ -53,11 +53,6 @@ private class SyncableImpl<T>(
     }
 
     private fun startSync() {
-        if (!scope.isActive) {
-            _continuation.cancel()
-            return
-        }
-
         scope.launch {
             if (_syncFlag.compareAndSet(false, true)) {
                 try {
@@ -75,6 +70,10 @@ private class SyncableImpl<T>(
                     _syncFlag.set(false)
                 }
             }
+        }
+
+        if (!scope.isActive) {
+            _continuation.cancel()
         }
     }
 }
