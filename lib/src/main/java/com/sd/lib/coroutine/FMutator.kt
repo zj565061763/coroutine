@@ -67,13 +67,9 @@ class FMutator {
     suspend fun cancel() {
         while (true) {
             val mutator = currentMutator.get() ?: return
-
             mutator.cancel()
+            mutator.job.join()
             currentMutator.compareAndSet(mutator, null)
-
-            if (currentMutator.get() == null) {
-                mutex.withLock { }
-            }
         }
     }
 }
