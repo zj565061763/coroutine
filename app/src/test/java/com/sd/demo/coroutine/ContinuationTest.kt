@@ -31,6 +31,36 @@ class ContinuationTest {
         continuation.resume(1)
 
         jobs.joinAll()
+        jobs.forEach { assertEquals(true, it.isCompleted) }
         assertEquals(5, count.get())
+    }
+
+    @Test
+    fun `test resumeWithException`(): Unit = runBlocking {
+        val continuation = FContinuation<Int>()
+
+        val count = AtomicInteger(0)
+        val jobs = mutableSetOf<Job>()
+
+        repeat(5) {
+            launch {
+                val result = try {
+                    continuation.await()
+                } catch (e: Exception) {
+                    assertEquals("resumeWithException", e.message)
+                    0
+                }
+                count.updateAndGet { it + result }
+            }.also { job ->
+                jobs.add(job)
+            }
+        }
+
+        delay(1_000)
+        continuation.resumeWithException(Exception("resumeWithException"))
+
+        jobs.joinAll()
+        jobs.forEach { assertEquals(true, it.isCompleted) }
+        assertEquals(0, count.get())
     }
 }
