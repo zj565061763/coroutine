@@ -10,9 +10,18 @@ open class FContinuation<T> {
 
     suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
-            addContinuation(cont)
-            cont.invokeOnCancellation {
-                removeContinuation(cont)
+            synchronized(this@FContinuation) {
+                _holder.add(cont)
+
+                cont.invokeOnCancellation {
+                    synchronized(this@FContinuation) {
+                        _holder.remove(cont)
+                    }
+                }
+
+                if (_holder.size == 1 && cont.isActive) {
+                    onFirstAwait()
+                }
             }
         }
     }
@@ -36,24 +45,10 @@ open class FContinuation<T> {
     }
 
     @Synchronized
-    private fun addContinuation(cont: CancellableContinuation<T>) {
-        if (_holder.add(cont)) {
-            if (_holder.size == 1 && cont.isActive) {
-                onFirstAwait()
-            }
-        }
-    }
-
-    @Synchronized
-    private fun removeContinuation(cont: CancellableContinuation<T>) {
-        _holder.remove(cont)
-    }
-
-    @Synchronized
     private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
         while (_holder.isNotEmpty()) {
             _holder.toTypedArray().forEach { cont ->
-                removeContinuation(cont)
+                _holder.remove(cont)
                 block(cont)
             }
         }
