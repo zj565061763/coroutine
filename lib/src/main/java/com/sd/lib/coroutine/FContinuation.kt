@@ -2,49 +2,66 @@ package com.sd.lib.coroutine
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class FContinuation<T> {
-    private val _holder: MutableSet<CancellableContinuation<T>> = Collections.synchronizedSet(hashSetOf())
+open class FContinuation<T> {
+    private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
-    suspend fun await(
-        block: (cont: CancellableContinuation<T>, size: Int) -> Unit = { _, _ -> }
-    ): T {
+    suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
-            _holder.add(cont)
+            addContinuation(cont)
             cont.invokeOnCancellation {
-                _holder.remove(cont)
+                removeContinuation(cont)
             }
-            block(cont, _holder.size)
         }
     }
 
     fun resume(value: T) {
-        foreach { cont ->
-            cont.resume(value)
+        foreach {
+            it.resume(value)
         }
     }
 
     fun resumeWithException(exception: Throwable) {
-        foreach { cont ->
-            cont.resumeWithException(exception)
+        foreach {
+            it.resumeWithException(exception)
         }
     }
 
     fun cancel(cause: Throwable? = null) {
-        foreach { cont ->
-            cont.cancel(cause)
+        foreach {
+            it.cancel(cause)
         }
     }
 
-    private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
-        while (_holder.isNotEmpty()) {
-            _holder.toTypedArray().forEach { cont ->
-                _holder.remove(cont)
-                block(cont)
+    @Synchronized
+    private fun addContinuation(cont: CancellableContinuation<T>) {
+        val oldSize = _holder.size
+        if (_holder.add(cont)) {
+            if (oldSize == 0 && cont.isActive) {
+                onFirstAwait()
             }
         }
     }
+
+    @Synchronized
+    private fun removeContinuation(cont: CancellableContinuation<T>) {
+        _holder.remove(cont)
+    }
+
+    @Synchronized
+    private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
+        while (_holder.isNotEmpty()) {
+            _holder.toTypedArray().forEach { cont ->
+                block(cont)
+                removeContinuation(cont)
+            }
+        }
+    }
+
+    /**
+     * [await]保存的[CancellableContinuation]数量从0到1时触发
+     */
+    protected open fun onFirstAwait() = Unit
 }

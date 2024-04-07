@@ -13,7 +13,12 @@ class SampleContinuation : AppCompatActivity() {
     private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
 
     private val _scope = FScope(lifecycleScope)
-    private val _continuation = FContinuation<String>()
+
+    private val _continuation = object : FContinuation<String>() {
+        override fun onFirstAwait() {
+            logMsg { "onFirstAwait ${Thread.currentThread().name}" }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
