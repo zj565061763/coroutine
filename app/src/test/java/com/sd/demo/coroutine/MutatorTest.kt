@@ -19,6 +19,7 @@ class MutatorTest {
             delay(1_000)
             mutator.mutate { }
             assertEquals(true, job.isCancelled)
+            assertEquals(true, job.isCompleted)
         }
     }
 
@@ -31,6 +32,7 @@ class MutatorTest {
             delay(1_000)
             mutator.mutate(1) { }
             assertEquals(true, job.isCancelled)
+            assertEquals(true, job.isCompleted)
         }
     }
 
