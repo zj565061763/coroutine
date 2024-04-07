@@ -68,8 +68,11 @@ class FMutator {
         while (true) {
             val mutator = currentMutator.get() ?: return
             mutator.cancel()
-            mutator.job.join()
-            currentMutator.compareAndSet(mutator, null)
+            try {
+                mutator.job.join()
+            } finally {
+                currentMutator.compareAndSet(mutator, null)
+            }
         }
     }
 }
