@@ -29,6 +29,7 @@ class ContinuationTest {
             }
         }
 
+        assertEquals(repeat, jobs.size)
         delay(1_000)
         assertEquals(repeat, continuation.size())
 
@@ -36,7 +37,6 @@ class ContinuationTest {
         continuation.resume(1)
 
         jobs.joinAll()
-        jobs.forEach { assertEquals(true, it.isCompleted) }
         assertEquals(5, count.get())
     }
 
@@ -62,6 +62,7 @@ class ContinuationTest {
             }
         }
 
+        assertEquals(repeat, jobs.size)
         delay(1_000)
         assertEquals(repeat, continuation.size())
 
@@ -69,7 +70,6 @@ class ContinuationTest {
         continuation.resumeWithException(Exception("resumeWithException"))
 
         jobs.joinAll()
-        jobs.forEach { assertEquals(true, it.isCompleted) }
         assertEquals(0, count.get())
     }
 
@@ -90,6 +90,7 @@ class ContinuationTest {
             }
         }
 
+        assertEquals(repeat, jobs.size)
         delay(1_000)
         assertEquals(repeat, continuation.size())
 
