@@ -53,6 +53,7 @@ class ScopeTest {
             delay(1_000)
             scope.cancel()
             jobs.forEach { assertEquals(true, it.isCancelled) }
+            jobs.joinAll()
         }
 
         val count = AtomicInteger(0)
@@ -70,12 +71,21 @@ class ScopeTest {
         val outScope = CoroutineScope(SupervisorJob())
         val scope = FScope(outScope)
 
-        scope.launch {
-            delay(Long.MAX_VALUE)
-        }.let { job ->
+        mutableSetOf<Job>().let { jobs ->
+            val repeat = 5
+            repeat(repeat) {
+                scope.launch {
+                    delay(Long.MAX_VALUE)
+                }.let { job ->
+                    assertEquals(true, job.isActive)
+                    jobs.add(job)
+                }
+            }
+            assertEquals(repeat, jobs.size)
+            delay(1_000)
             outScope.cancel()
-            assertEquals(true, job.isCancelled)
-            job.join()
+            jobs.forEach { assertEquals(true, it.isCancelled) }
+            jobs.joinAll()
         }
 
         val count = AtomicInteger(0)
