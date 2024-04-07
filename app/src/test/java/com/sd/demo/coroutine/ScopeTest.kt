@@ -35,7 +35,7 @@ class ScopeTest {
     }
 
     @Test
-    fun `test cancel`(): Unit = runBlocking {
+    fun `test cancel scope`(): Unit = runBlocking {
         val scope = FScope(this)
 
         scope.launch {
