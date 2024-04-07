@@ -24,4 +24,15 @@ class SyncableTest {
         assertEquals(999, syncable.syncAwait().getOrThrow())
         assertEquals(1, count.get())
     }
+
+    @Test
+    fun `test sync failure`(): Unit = runBlocking {
+        val syncable = FSyncable(scope = this) {
+            error("failure")
+        }
+
+        syncable.syncAwait().let { result ->
+            assertEquals("failure", result.exceptionOrNull()!!.message)
+        }
+    }
 }
