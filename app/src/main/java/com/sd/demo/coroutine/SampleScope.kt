@@ -18,11 +18,9 @@ class SampleScope : AppCompatActivity() {
         setContentView(_binding.root)
         _binding.btnLaunch.setOnClickListener {
             _scope.launch { start("launch") }
-            logMsg { "launch size:${_scope.size()}" }
         }
         _binding.btnCancel.setOnClickListener {
             _scope.cancel()
-            logMsg { "cancel size:${_scope.size()}" }
         }
     }
 
