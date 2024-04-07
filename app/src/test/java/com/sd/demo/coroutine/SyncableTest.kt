@@ -1,6 +1,9 @@
 package com.sd.demo.coroutine
 
 import com.sd.lib.coroutine.FSyncable
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -33,6 +36,19 @@ class SyncableTest {
 
         syncable.syncAwait().let { result ->
             assertEquals("failure", result.exceptionOrNull()!!.message)
+        }
+    }
+
+    @Test
+    fun `test cancel onSync`(): Unit = runBlocking {
+        val syncable = FSyncable(scope = this) {
+            currentCoroutineContext().cancel()
+        }
+
+        try {
+            syncable.syncAwait()
+        } catch (e: Throwable) {
+            assertEquals(true, e is CancellationException)
         }
     }
 }
