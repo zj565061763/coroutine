@@ -64,7 +64,7 @@ class FMutator {
 
     //-------------------- ext --------------------
 
-    suspend fun cancel() {
+    suspend fun cancelAndJoin() {
         while (true) {
             val mutator = currentMutator.get() ?: return
             mutator.cancel()

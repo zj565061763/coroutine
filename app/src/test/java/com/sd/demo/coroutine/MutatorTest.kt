@@ -64,7 +64,7 @@ class MutatorTest {
             delay(1_000)
             repeat(1_000) {
                 launch {
-                    mutator.cancel()
+                    mutator.cancelAndJoin()
                     assertEquals(true, job.isCancelled)
                     assertEquals(true, job.isCompleted)
                 }
