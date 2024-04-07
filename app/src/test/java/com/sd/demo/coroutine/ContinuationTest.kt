@@ -2,6 +2,7 @@ package com.sd.demo.coroutine
 
 import com.sd.lib.coroutine.FContinuation
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -61,6 +62,28 @@ class ContinuationTest {
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
+        assertEquals(0, count.get())
+    }
+
+    @Test
+    fun `test cancel out`(): Unit = runBlocking {
+        val continuation = FContinuation<Int>()
+
+        val count = AtomicInteger(0)
+        val jobs = mutableSetOf<Job>()
+
+        repeat(5) {
+            launch {
+                val result = continuation.await()
+                count.updateAndGet { it + result }
+            }.also { job ->
+                jobs.add(job)
+            }
+        }
+
+        delay(1_000)
+        jobs.forEach { it.cancelAndJoin() }
+        jobs.forEach { assertEquals(true, it.isCancelled) }
         assertEquals(0, count.get())
     }
 }
