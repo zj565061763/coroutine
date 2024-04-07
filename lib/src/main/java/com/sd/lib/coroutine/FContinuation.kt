@@ -53,8 +53,8 @@ open class FContinuation<T> {
     private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
         while (_holder.isNotEmpty()) {
             _holder.toTypedArray().forEach { cont ->
-                block(cont)
                 removeContinuation(cont)
+                block(cont)
             }
         }
     }
