@@ -37,9 +37,8 @@ open class FContinuation<T> {
 
     @Synchronized
     private fun addContinuation(cont: CancellableContinuation<T>) {
-        val oldSize = _holder.size
         if (_holder.add(cont)) {
-            if (oldSize == 0 && cont.isActive) {
+            if (_holder.size == 1 && cont.isActive) {
                 onFirstAwait()
             }
         }
