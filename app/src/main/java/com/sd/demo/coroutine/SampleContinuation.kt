@@ -2,6 +2,7 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sd.demo.coroutine.databinding.SampleContinuationBinding
 import com.sd.lib.coroutine.FContinuation
 import com.sd.lib.coroutine.FScope
@@ -11,7 +12,7 @@ import java.util.UUID
 class SampleContinuation : AppCompatActivity() {
     private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope()
+    private val _scope = FScope(lifecycleScope)
 
     private val _continuation = object : FContinuation<String>() {
         override fun onFirstAwait() {
@@ -51,10 +52,5 @@ class SampleContinuation : AppCompatActivity() {
         }
 
         logMsg { "$tag finish ($result) $uuid" }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _scope.cancel()
     }
 }

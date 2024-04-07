@@ -2,10 +2,9 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sd.demo.coroutine.databinding.SampleMutatorBinding
 import com.sd.lib.coroutine.FMutator
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -14,13 +13,12 @@ class SampleMutator : AppCompatActivity() {
     private val _binding by lazy { SampleMutatorBinding.inflate(layoutInflater) }
 
     private val _mutator = FMutator()
-    private val _scope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
         _binding.btnMutate1.setOnClickListener {
-            _scope.launch {
+            lifecycleScope.launch {
                 logMsg { "click mutate_1" }
                 _mutator.mutate {
                     start("mutate_1")
@@ -28,7 +26,7 @@ class SampleMutator : AppCompatActivity() {
             }
         }
         _binding.btnMutate2.setOnClickListener {
-            _scope.launch {
+            lifecycleScope.launch {
                 logMsg { "click mutate_2" }
                 _mutator.mutate(priority = 1) {
                     start("mutate_2")
@@ -37,7 +35,9 @@ class SampleMutator : AppCompatActivity() {
         }
         _binding.btnCancel.setOnClickListener {
             logMsg { "click cancel" }
-            _mutator.cancel()
+            lifecycleScope.launch {
+                _mutator.cancel()
+            }
         }
     }
 
@@ -53,10 +53,5 @@ class SampleMutator : AppCompatActivity() {
         }
 
         logMsg { "$tag finish $uuid" }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _scope.cancel()
     }
 }

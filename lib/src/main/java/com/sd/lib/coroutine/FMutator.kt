@@ -64,12 +64,12 @@ class FMutator {
 
     //-------------------- ext --------------------
 
-    fun cancel() {
+    suspend fun cancel() {
         while (true) {
             val mutator = currentMutator.get() ?: return
             mutator.cancel()
             if (currentMutator.compareAndSet(mutator, null)) {
-                break
+                mutex.withLock { }
             }
         }
     }

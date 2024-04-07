@@ -2,6 +2,7 @@ package com.sd.demo.coroutine
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sd.demo.coroutine.databinding.SampleScopeBinding
 import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.delay
@@ -10,7 +11,7 @@ import java.util.UUID
 class SampleScope : AppCompatActivity() {
     private val _binding by lazy { SampleScopeBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope()
+    private val _scope = FScope(lifecycleScope)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +38,5 @@ class SampleScope : AppCompatActivity() {
         }
 
         logMsg { "$tag finish $uuid" }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _scope.cancel()
     }
 }
