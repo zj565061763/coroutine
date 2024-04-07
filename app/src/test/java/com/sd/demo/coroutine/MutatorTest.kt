@@ -2,6 +2,7 @@ package com.sd.demo.coroutine
 
 import com.sd.lib.coroutine.FMutator
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -36,20 +37,20 @@ class MutatorTest {
     @Test
     fun `test cancel self`(): Unit = runBlocking {
         val mutator = FMutator()
-
-        val job = launch {
-            mutator.mutate(1) { delay(2_000) }
+        launch {
+            mutator.mutate { delay(Long.MAX_VALUE) }
+        }.let { job ->
+            delay(1_000)
+            val result = try {
+                mutator.mutate(-1) { }
+                "mutate"
+            } catch (e: CancellationException) {
+                "CancellationException"
+            }
+            assertEquals(result, "CancellationException")
+            assertEquals(true, job.isActive)
+            job.cancelAndJoin()
         }
-
-        delay(1_000)
-        val result = try {
-            mutator.mutate { }
-            "mutate"
-        } catch (e: CancellationException) {
-            "CancellationException"
-        }
-        assertEquals(result, "CancellationException")
-        assertEquals(true, job.isActive)
     }
 
     @Test
