@@ -12,7 +12,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 class FScope(
     private val scope: CoroutineScope = MainScope()
 ) {
-    private val _holder: MutableSet<Job> = Collections.synchronizedSet(hashSetOf())
+    private val _holder: MutableSet<Job> = Collections.synchronizedSet(mutableSetOf())
 
     /**
      * 启动协程
