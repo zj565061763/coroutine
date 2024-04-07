@@ -54,24 +54,6 @@ private suspend fun testLaunchSuccess(scope: FScope) {
     assertEquals(5, count.get())
 }
 
-private suspend fun testLaunchCanceledScope(scope: FScope) {
-    val count = AtomicInteger(0)
-    val jobs = mutableSetOf<Job>()
-
-    repeat(5) {
-        scope.launch {
-            count.incrementAndGet()
-        }.let { job ->
-            assertEquals(false, job.isActive)
-            jobs.add(job)
-        }
-    }
-
-    assertEquals(5, jobs.size)
-    jobs.joinAll()
-    assertEquals(0, count.get())
-}
-
 private suspend fun testCancelScope(
     scope: FScope,
     cancelScope: () -> Unit,
@@ -95,4 +77,22 @@ private suspend fun testCancelScope(
 
     jobs.forEach { assertEquals(true, it.isCancelled) }
     jobs.joinAll()
+}
+
+private suspend fun testLaunchCanceledScope(scope: FScope) {
+    val count = AtomicInteger(0)
+    val jobs = mutableSetOf<Job>()
+
+    repeat(5) {
+        scope.launch {
+            count.incrementAndGet()
+        }.let { job ->
+            assertEquals(false, job.isActive)
+            jobs.add(job)
+        }
+    }
+
+    assertEquals(5, jobs.size)
+    jobs.joinAll()
+    assertEquals(0, count.get())
 }
