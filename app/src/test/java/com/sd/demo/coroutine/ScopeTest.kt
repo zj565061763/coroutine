@@ -38,10 +38,20 @@ class ScopeTest {
 
     @Test
     fun `test launch size`(): Unit = runBlocking {
-        val scope = FScope(this)
+        val outScope = CoroutineScope(SupervisorJob())
+        val scope = FScope(outScope)
 
         scope.launch {
-            delay(1_000)
+            delay(1_00)
+        }.let { job ->
+            assertEquals(1, scope.size())
+            job.cancelAndJoin()
+            assertEquals(true, job.isCancelled)
+            assertEquals(0, scope.size())
+        }
+
+        scope.launch {
+            delay(1_00)
         }.let { job ->
             assertEquals(1, scope.size())
             scope.cancel()
@@ -51,10 +61,11 @@ class ScopeTest {
         }
 
         scope.launch {
-            delay(1_000)
+            delay(1_00)
         }.let { job ->
             assertEquals(1, scope.size())
-            job.cancelAndJoin()
+            outScope.cancel()
+            job.join()
             assertEquals(true, job.isCancelled)
             assertEquals(0, scope.size())
         }
