@@ -17,18 +17,15 @@ class SyncableTest {
         val count = AtomicInteger(0)
 
         val syncable = FSyncable(scope = this) {
-            count.incrementAndGet()
             delay(1_000)
-            999
+            count.incrementAndGet()
         }
 
         syncable.sync()
         syncable.sync()
-        assertEquals(999, syncable.syncAwait().getOrThrow())
-        assertEquals(1, count.get())
 
-        assertEquals(999, syncable.syncAwait().getOrThrow())
-        assertEquals(2, count.get())
+        assertEquals(1, syncable.syncAwait().getOrThrow())
+        assertEquals(2, syncable.syncAwait().getOrThrow())
     }
 
     @Test
