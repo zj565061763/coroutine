@@ -2,6 +2,8 @@ package com.sd.demo.coroutine
 
 import com.sd.lib.coroutine.FSyncable
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -43,6 +45,22 @@ class SyncableTest {
     fun `test cancel onSync`(): Unit = runBlocking {
         val syncable = FSyncable(scope = this) {
             currentCoroutineContext().cancel()
+        }
+
+        try {
+            syncable.syncAwait()
+        } catch (e: Throwable) {
+            assertEquals(true, e is CancellationException)
+        }
+    }
+
+    @Test
+    fun `test cancel scope`(): Unit = runBlocking {
+        val outScope = CoroutineScope(SupervisorJob())
+
+        val syncable = FSyncable(scope = outScope) {
+            outScope.cancel()
+            1
         }
 
         try {
