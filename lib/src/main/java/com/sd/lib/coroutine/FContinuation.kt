@@ -9,12 +9,15 @@ import kotlin.coroutines.resumeWithException
 class FContinuation<T> {
     private val _holder: MutableSet<CancellableContinuation<T>> = Collections.synchronizedSet(hashSetOf())
 
-    suspend fun await(): T {
+    suspend fun await(
+        block: (cont: CancellableContinuation<T>, size: Int) -> Unit = { _, _ -> }
+    ): T {
         return suspendCancellableCoroutine { cont ->
             _holder.add(cont)
             cont.invokeOnCancellation {
                 _holder.remove(cont)
             }
+            block(cont, _holder.size)
         }
     }
 
