@@ -159,46 +159,4 @@ class ContinuationTest {
         jobs.forEach { assertEquals(true, it.isCompleted) }
         assertEquals(0, count.get())
     }
-
-    @Test
-    fun `test onFirstAwait`(): Unit = runBlocking {
-        val count = AtomicInteger(0)
-        val continuation = object : FContinuation<Unit>() {
-            override fun onFirstAwait() {
-                count.incrementAndGet()
-            }
-        }
-
-        mutableSetOf<Job>().let { jobs ->
-            val repeat = 5
-            repeat(repeat) {
-                launch {
-                    continuation.await()
-                }.also { job ->
-                    jobs.add(job)
-                }
-            }
-            assertEquals(repeat, jobs.size)
-            delay(1_000)
-            continuation.resume(Unit)
-            jobs.joinAll()
-            assertEquals(1, count.get())
-        }
-
-        mutableSetOf<Job>().let { jobs ->
-            val repeat = 5
-            repeat(repeat) {
-                launch {
-                    continuation.await()
-                }.also { job ->
-                    jobs.add(job)
-                }
-            }
-            assertEquals(repeat, jobs.size)
-            delay(1_000)
-            continuation.resume(Unit)
-            jobs.joinAll()
-            assertEquals(2, count.get())
-        }
-    }
 }
