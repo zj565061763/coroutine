@@ -51,4 +51,16 @@ class MutatorTest {
         assertEquals(result, "CancellationException")
         assertEquals(true, job.isActive)
     }
+
+    @Test
+    fun `test cancel`(): Unit = runBlocking {
+        val mutator = FMutator()
+        launch {
+            mutator.mutate { delay(Long.MAX_VALUE) }
+        }.let { job ->
+            delay(1_000)
+            mutator.cancel()
+            assertEquals(true, job.isCancelled)
+        }
+    }
 }
