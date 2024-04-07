@@ -21,6 +21,9 @@ class MainActivity : AppCompatActivity() {
         _binding.btnSampleContinuation.setOnClickListener {
             startActivity(Intent(this, SampleContinuation::class.java))
         }
+        _binding.btnSampleSyncable.setOnClickListener {
+            startActivity(Intent(this, SampleSyncable::class.java))
+        }
     }
 }
 
