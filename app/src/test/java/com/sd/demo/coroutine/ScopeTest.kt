@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class ScopeTest {
     @Test
-    fun `test launch size`(): Unit = runBlocking {
+    fun `test launch`(): Unit = runBlocking {
         val scope = FScope(this)
 
         val count = AtomicInteger(0)
@@ -23,20 +24,40 @@ class ScopeTest {
         val repeat = 5
         repeat(repeat) {
             scope.launch {
-                delay(2_000)
                 count.incrementAndGet()
             }.let { job ->
+                assertEquals(true, job.isActive)
                 jobs.add(job)
             }
         }
 
         assertEquals(repeat, jobs.size)
-        delay(1_000)
-        jobs.forEach { assertEquals(true, it.isActive) }
-        assertEquals(repeat, scope.size())
-
         jobs.joinAll()
         assertEquals(repeat, count.get())
+    }
+
+    @Test
+    fun `test launch size`(): Unit = runBlocking {
+        val scope = FScope(this)
+
+        scope.launch {
+            delay(1_000)
+        }.let { job ->
+            assertEquals(1, scope.size())
+            scope.cancel()
+            job.join()
+            assertEquals(true, job.isCancelled)
+            assertEquals(0, scope.size())
+        }
+
+        scope.launch {
+            delay(1_000)
+        }.let { job ->
+            assertEquals(1, scope.size())
+            job.cancelAndJoin()
+            assertEquals(true, job.isCancelled)
+            assertEquals(0, scope.size())
+        }
     }
 
     @Test
@@ -48,8 +69,12 @@ class ScopeTest {
         }.let { job ->
             delay(1_000)
             assertEquals(true, job.isActive)
+            assertEquals(1, scope.size())
+
             scope.cancel()
+
             assertEquals(true, job.isCancelled)
+            assertEquals(0, scope.size())
             job.join()
         }
 
@@ -60,8 +85,12 @@ class ScopeTest {
         }.let { job ->
             delay(1_000)
             assertEquals(true, job.isActive)
+            assertEquals(1, scope.size())
+
             job.join()
+
             assertEquals(1, count.get())
+            assertEquals(0, scope.size())
         }
     }
 
@@ -75,9 +104,13 @@ class ScopeTest {
         }.let { job ->
             delay(1_000)
             assertEquals(true, job.isActive)
+            assertEquals(1, scope.size())
+
             outScope.cancel()
-            assertEquals(true, job.isCancelled)
             job.join()
+
+            assertEquals(true, job.isCancelled)
+            assertEquals(0, scope.size())
         }
 
         val count = AtomicInteger(0)
