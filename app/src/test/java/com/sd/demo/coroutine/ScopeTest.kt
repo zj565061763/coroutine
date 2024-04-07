@@ -2,9 +2,11 @@ package com.sd.demo.coroutine
 
 import com.sd.lib.coroutine.FScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -16,25 +18,25 @@ class ScopeTest {
         val scope = FScope(this)
 
         val count = AtomicInteger(0)
+        val jobs = mutableSetOf<Job>()
 
-        val job1 = scope.launch {
-            delay(2_000)
-            count.incrementAndGet()
+        val repeat = 5
+        repeat(repeat) {
+            scope.launch {
+                delay(2_000)
+                count.incrementAndGet()
+            }.let { job ->
+                jobs.add(job)
+            }
         }
 
-        val job2 = scope.launch {
-            delay(2_000)
-            count.incrementAndGet()
-        }
-
+        assertEquals(repeat, jobs.size)
         delay(1_000)
-        assertEquals(true, job1.isActive)
-        assertEquals(true, job2.isActive)
-        assertEquals(2, scope.size())
+        jobs.forEach { assertEquals(true, it.isActive) }
+        assertEquals(repeat, scope.size())
 
-        job1.join()
-        job2.join()
-        assertEquals(2, count.get())
+        jobs.joinAll()
+        assertEquals(repeat, count.get())
     }
 
     @Test
