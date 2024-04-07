@@ -49,7 +49,7 @@ class SampleSyncable : AppCompatActivity() {
     private suspend fun loadData(): Int {
         logMsg { "loadData start" }
         try {
-            delay(10_000)
+            delay(5_000)
         } catch (e: Throwable) {
             logMsg { "loadData error:$e" }
             throw e
