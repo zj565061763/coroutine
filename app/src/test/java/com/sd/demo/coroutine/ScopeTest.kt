@@ -51,6 +51,7 @@ class ScopeTest {
         scope.launch {
             count.incrementAndGet()
         }.let { job ->
+            assertEquals(true, job.isActive)
             job.join()
             assertEquals(1, count.get())
         }
