@@ -9,8 +9,9 @@ import java.util.Collections
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-class FScope(scope: CoroutineScope = MainScope()) {
-    private val _scope = scope
+class FScope(
+    private val scope: CoroutineScope = MainScope()
+) {
     private val _holder: MutableSet<Job> = Collections.synchronizedSet(hashSetOf())
 
     /**
@@ -21,7 +22,7 @@ class FScope(scope: CoroutineScope = MainScope()) {
         start: CoroutineStart = CoroutineStart.DEFAULT,
         block: suspend CoroutineScope.() -> Unit,
     ): Job {
-        return _scope.launch(
+        return scope.launch(
             context = context,
             start = start,
             block = block,
@@ -34,7 +35,7 @@ class FScope(scope: CoroutineScope = MainScope()) {
     }
 
     /**
-     * 取消协程
+     * 取消协程，[scope]不会被取消
      */
     fun cancel() {
         while (_holder.isNotEmpty()) {
