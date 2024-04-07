@@ -66,6 +66,7 @@ class MutatorTest {
                 launch {
                     mutator.cancel()
                     assertEquals(true, job.isCancelled)
+                    assertEquals(true, job.isCompleted)
                 }
             }
         }
