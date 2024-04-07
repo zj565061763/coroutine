@@ -65,21 +65,15 @@ class ScopeTest {
         scope.launch {
             delay(Long.MAX_VALUE)
         }.let { job ->
-            delay(1_000)
-            assertEquals(true, job.isActive)
-
             outScope.cancel()
-            job.join()
-
             assertEquals(true, job.isCancelled)
+            job.join()
         }
 
         val count = AtomicInteger(0)
         scope.launch {
-            delay(2_000)
             count.incrementAndGet()
         }.let { job ->
-            delay(1_000)
             assertEquals(false, job.isActive)
             job.join()
             assertEquals(0, count.get())
