@@ -7,6 +7,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -59,8 +60,19 @@ class SyncableTest {
         val outScope = CoroutineScope(SupervisorJob())
 
         val syncable = FSyncable(scope = outScope) {
-            outScope.cancel()
+            delay(Long.MAX_VALUE)
             1
+        }
+
+        launch {
+            delay(1_000)
+            outScope.cancel()
+        }
+
+        try {
+            syncable.syncAwait()
+        } catch (e: Throwable) {
+            assertEquals(true, e is CancellationException)
         }
 
         try {
