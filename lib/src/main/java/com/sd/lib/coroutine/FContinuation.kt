@@ -36,11 +36,6 @@ open class FContinuation<T> {
     }
 
     @Synchronized
-    fun size(): Int {
-        return _holder.size
-    }
-
-    @Synchronized
     private fun addContinuation(cont: CancellableContinuation<T>) {
         val oldSize = _holder.size
         if (_holder.add(cont)) {
