@@ -39,22 +39,7 @@ class ScopeTest {
     fun `test cancel scope`(): Unit = runBlocking {
         val scope = FScope(this)
 
-        mutableSetOf<Job>().let { jobs ->
-            val repeat = 5
-            repeat(repeat) {
-                scope.launch {
-                    delay(Long.MAX_VALUE)
-                }.let { job ->
-                    assertEquals(true, job.isActive)
-                    jobs.add(job)
-                }
-            }
-            assertEquals(repeat, jobs.size)
-            delay(1_000)
-            scope.cancel()
-            jobs.forEach { assertEquals(true, it.isCancelled) }
-            jobs.joinAll()
-        }
+        testCancelScope(scope) { scope.cancel() }
 
         val count = AtomicInteger(0)
         scope.launch {
@@ -71,22 +56,7 @@ class ScopeTest {
         val outScope = CoroutineScope(SupervisorJob())
         val scope = FScope(outScope)
 
-        mutableSetOf<Job>().let { jobs ->
-            val repeat = 5
-            repeat(repeat) {
-                scope.launch {
-                    delay(Long.MAX_VALUE)
-                }.let { job ->
-                    assertEquals(true, job.isActive)
-                    jobs.add(job)
-                }
-            }
-            assertEquals(repeat, jobs.size)
-            delay(1_000)
-            outScope.cancel()
-            jobs.forEach { assertEquals(true, it.isCancelled) }
-            jobs.joinAll()
-        }
+        testCancelScope(scope) { outScope.cancel() }
 
         val count = AtomicInteger(0)
         scope.launch {
@@ -97,4 +67,29 @@ class ScopeTest {
             assertEquals(0, count.get())
         }
     }
+}
+
+private suspend fun testCancelScope(
+    scope: FScope,
+    cancelScope: () -> Unit,
+) {
+    val jobs = mutableSetOf<Job>()
+
+    repeat(5) {
+        scope.launch {
+            delay(Long.MAX_VALUE)
+        }.let { job ->
+            assertEquals(true, job.isActive)
+            jobs.add(job)
+        }
+    }
+
+    assertEquals(5, jobs.size)
+    delay(1_000)
+
+    // cancel scope
+    cancelScope()
+
+    jobs.forEach { assertEquals(true, it.isCancelled) }
+    jobs.joinAll()
 }
