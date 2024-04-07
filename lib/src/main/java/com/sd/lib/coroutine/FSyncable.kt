@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -36,18 +37,27 @@ private class SyncableImpl<T>(
 ) : FSyncable<T> {
 
     private val _syncFlag = AtomicBoolean(false)
-    private val _continuation = FContinuation<Result<T>>()
+
+    private val _continuation = object : FContinuation<Result<T>>() {
+        override fun onFirstAwait() {
+            startSync()
+        }
+    }
 
     override fun sync() {
         startSync()
     }
 
     override suspend fun syncAwait(): Result<T> {
-        startSync()
         return _continuation.await()
     }
 
     private fun startSync() {
+        if (!scope.isActive) {
+            _continuation.cancel()
+            return
+        }
+
         scope.launch {
             if (_syncFlag.compareAndSet(false, true)) {
                 try {

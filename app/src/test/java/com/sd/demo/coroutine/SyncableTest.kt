@@ -29,6 +29,7 @@ class SyncableTest {
 
         assertEquals(1, syncable.syncAwait().getOrThrow())
         assertEquals(2, syncable.syncAwait().getOrThrow())
+        assertEquals(3, syncable.syncAwait().getOrThrow())
     }
 
     @Test
