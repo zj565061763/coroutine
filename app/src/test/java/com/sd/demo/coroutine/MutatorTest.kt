@@ -56,7 +56,7 @@ class MutatorTest {
     }
 
     @Test
-    fun `test cancel`(): Unit = runBlocking {
+    fun `test cancelAndJoin`(): Unit = runBlocking {
         val mutator = FMutator()
         launch {
             mutator.mutate { delay(Long.MAX_VALUE) }
