@@ -58,13 +58,13 @@ private class SyncableImpl<T>(
                 try {
                     val data = onSync()
                     currentCoroutineContext().ensureActive()
-                    _continuations.resume(Result.success(data))
+                    _continuations.resumeAll(Result.success(data))
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
                         _continuations.cancel()
                         throw e
                     } else {
-                        _continuations.resume(Result.failure(e))
+                        _continuations.resumeAll(Result.failure(e))
                     }
                 } finally {
                     _syncFlag.set(false)

@@ -28,7 +28,7 @@ class SampleContinuations : AppCompatActivity() {
         }
         _binding.btnResume.setOnClickListener {
             logMsg { "click resume" }
-            _continuations.resume("hello")
+            _continuations.resumeAll("hello")
         }
         _binding.btnCancelContinuations.setOnClickListener {
             logMsg { "click cancel continuations" }

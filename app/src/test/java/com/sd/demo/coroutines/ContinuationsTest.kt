@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class ContinuationsTest {
     @Test
-    fun `test resume`(): Unit = runBlocking {
+    fun `test resumeAll`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
@@ -31,9 +31,9 @@ class ContinuationsTest {
         assertEquals(5, jobs.size)
         delay(1_000)
 
-        // resume
-        continuations.resume(1)
-        continuations.resume(2)
+        // resumeAll
+        continuations.resumeAll(1)
+        continuations.resumeAll(2)
 
         jobs.joinAll()
         assertEquals(5, count.get())
@@ -178,7 +178,7 @@ class ContinuationsTest {
             assertEquals(5, jobs.size)
             delay(1_000)
 
-            continuations.resume(Unit)
+            continuations.resumeAll(Unit)
             jobs.joinAll()
             assertEquals(1, count.get())
         }
@@ -195,7 +195,7 @@ class ContinuationsTest {
             assertEquals(repeat, jobs.size)
             delay(1_000)
 
-            continuations.resume(Unit)
+            continuations.resumeAll(Unit)
             jobs.joinAll()
             assertEquals(2, count.get())
         }
@@ -206,8 +206,8 @@ class ContinuationsTest {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
                 // resume
-                resume(1)
-                resume(2)
+                resumeAll(1)
+                resumeAll(2)
             }
         }
         assertEquals(1, continuations.await())

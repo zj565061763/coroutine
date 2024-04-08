@@ -25,7 +25,7 @@ open class FContinuations<T> {
         }
     }
 
-    fun resume(value: T) {
+    fun resumeAll(value: T) {
         foreach {
             it.resume(value)
         }
