@@ -19,8 +19,7 @@ class ContinuationsTest {
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
 
-        val repeat = 5
-        repeat(repeat) {
+        repeat(5) {
             launch {
                 val result = continuations.await()
                 count.updateAndGet { it + result }
@@ -29,11 +28,12 @@ class ContinuationsTest {
             }
         }
 
-        assertEquals(repeat, jobs.size)
+        assertEquals(5, jobs.size)
         delay(1_000)
 
         // resume
         continuations.resume(1)
+        continuations.resume(2)
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
@@ -47,13 +47,12 @@ class ContinuationsTest {
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
 
-        val repeat = 5
-        repeat(repeat) {
+        repeat(5) {
             launch {
                 val result = try {
                     continuations.await()
                 } catch (e: Exception) {
-                    assertEquals("resumeWithException", e.message)
+                    assertEquals("resumeWithException1", e.message)
                     0
                 }
                 count.updateAndGet { it + result }
@@ -62,11 +61,12 @@ class ContinuationsTest {
             }
         }
 
-        assertEquals(repeat, jobs.size)
+        assertEquals(5, jobs.size)
         delay(1_000)
 
         // resumeWithException
-        continuations.resumeWithException(Exception("resumeWithException"))
+        continuations.resumeWithException(Exception("resumeWithException1"))
+        continuations.resumeWithException(Exception("resumeWithException2"))
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
