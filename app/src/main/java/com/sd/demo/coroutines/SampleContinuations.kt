@@ -14,7 +14,7 @@ class SampleContinuations : AppCompatActivity() {
 
     private val _scope = FScope(lifecycleScope)
 
-    private val _continuation = object : FContinuations<String>() {
+    private val _continuations = object : FContinuations<String>() {
         override fun onFirstAwait() {
             logMsg { "onFirstAwait ${Thread.currentThread().name}" }
         }
@@ -28,11 +28,11 @@ class SampleContinuations : AppCompatActivity() {
         }
         _binding.btnResume.setOnClickListener {
             logMsg { "click resume" }
-            _continuation.resume("hello")
+            _continuations.resume("hello")
         }
-        _binding.btnCancelContinuation.setOnClickListener {
-            logMsg { "click cancel continuation" }
-            _continuation.cancel()
+        _binding.btnCancelContinuations.setOnClickListener {
+            logMsg { "click cancel continuations" }
+            _continuations.cancel()
         }
         _binding.btnCancelLaunch.setOnClickListener {
             logMsg { "click cancel launch" }
@@ -45,7 +45,7 @@ class SampleContinuations : AppCompatActivity() {
         logMsg { "$tag start $uuid" }
 
         val result = try {
-            _continuation.await()
+            _continuations.await()
         } catch (e: Exception) {
             logMsg { "$tag Exception:$e $uuid" }
             throw e

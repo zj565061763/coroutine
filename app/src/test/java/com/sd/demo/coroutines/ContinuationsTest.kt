@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class ContinuationsTest {
     @Test
     fun `test resume`(): Unit = runBlocking {
-        val continuation = FContinuations<Int>()
+        val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -22,7 +22,7 @@ class ContinuationsTest {
         val repeat = 5
         repeat(repeat) {
             launch {
-                val result = continuation.await()
+                val result = continuations.await()
                 count.updateAndGet { it + result }
             }.also { job ->
                 jobs.add(job)
@@ -33,7 +33,7 @@ class ContinuationsTest {
         delay(1_000)
 
         // resume
-        continuation.resume(1)
+        continuations.resume(1)
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
@@ -42,7 +42,7 @@ class ContinuationsTest {
 
     @Test
     fun `test resumeWithException`(): Unit = runBlocking {
-        val continuation = FContinuations<Int>()
+        val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -51,7 +51,7 @@ class ContinuationsTest {
         repeat(repeat) {
             launch {
                 val result = try {
-                    continuation.await()
+                    continuations.await()
                 } catch (e: Exception) {
                     assertEquals("resumeWithException", e.message)
                     0
@@ -66,7 +66,7 @@ class ContinuationsTest {
         delay(1_000)
 
         // resumeWithException
-        continuation.resumeWithException(Exception("resumeWithException"))
+        continuations.resumeWithException(Exception("resumeWithException"))
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
@@ -75,7 +75,7 @@ class ContinuationsTest {
 
     @Test
     fun `test cancel outside`(): Unit = runBlocking {
-        val continuation = FContinuations<Int>()
+        val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -83,7 +83,7 @@ class ContinuationsTest {
         val repeat = 5
         repeat(repeat) {
             launch {
-                val result = continuation.await()
+                val result = continuations.await()
                 count.updateAndGet { it + result }
             }.also { job ->
                 jobs.add(job)
@@ -101,7 +101,7 @@ class ContinuationsTest {
 
     @Test
     fun `test cancel inside`(): Unit = runBlocking {
-        val continuation = FContinuations<Int>()
+        val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -109,7 +109,7 @@ class ContinuationsTest {
         val repeat = 5
         repeat(repeat) {
             launch {
-                val result = continuation.await()
+                val result = continuations.await()
                 count.updateAndGet { it + result }
             }.also { job ->
                 jobs.add(job)
@@ -120,7 +120,7 @@ class ContinuationsTest {
         delay(1_000)
 
         // cancel inside
-        continuation.cancel()
+        continuations.cancel()
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCancelled) }
@@ -129,7 +129,7 @@ class ContinuationsTest {
 
     @Test
     fun `test cancel inside with cause`(): Unit = runBlocking {
-        val continuation = FContinuations<Int>()
+        val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -138,7 +138,7 @@ class ContinuationsTest {
         repeat(repeat) {
             launch {
                 val result = try {
-                    continuation.await()
+                    continuations.await()
                 } catch (e: Exception) {
                     assertEquals("cancel with cause", e.message)
                     0
@@ -153,7 +153,7 @@ class ContinuationsTest {
         delay(1_000)
 
         // cancel inside with cause
-        continuation.cancel(Exception("cancel with cause"))
+        continuations.cancel(Exception("cancel with cause"))
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
@@ -163,7 +163,7 @@ class ContinuationsTest {
     @Test
     fun `test onFirstAwait`(): Unit = runBlocking {
         val count = AtomicInteger(0)
-        val continuation = object : FContinuations<Unit>() {
+        val continuations = object : FContinuations<Unit>() {
             override fun onFirstAwait() {
                 count.incrementAndGet()
             }
@@ -173,14 +173,14 @@ class ContinuationsTest {
             val repeat = 5
             repeat(repeat) {
                 launch {
-                    continuation.await()
+                    continuations.await()
                 }.also { job ->
                     jobs.add(job)
                 }
             }
             assertEquals(repeat, jobs.size)
             delay(1_000)
-            continuation.resume(Unit)
+            continuations.resume(Unit)
             jobs.joinAll()
             assertEquals(1, count.get())
         }
@@ -189,14 +189,14 @@ class ContinuationsTest {
             val repeat = 5
             repeat(repeat) {
                 launch {
-                    continuation.await()
+                    continuations.await()
                 }.also { job ->
                     jobs.add(job)
                 }
             }
             assertEquals(repeat, jobs.size)
             delay(1_000)
-            continuation.resume(Unit)
+            continuations.resume(Unit)
             jobs.joinAll()
             assertEquals(2, count.get())
         }
