@@ -202,7 +202,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test onFirstAwait resume`(): Unit = runBlocking {
+    fun `test onFirstAwait resumeAll`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
                 // resumeAll
@@ -214,7 +214,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test onFirstAwait resumeWithException`(): Unit = runBlocking {
+    fun `test onFirstAwait resumeAllWithException`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
                 // resumeAllWithException
@@ -234,7 +234,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test onFirstAwait cancel`(): Unit = runBlocking {
+    fun `test onFirstAwait cancelAll`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
                 // cancelAll
