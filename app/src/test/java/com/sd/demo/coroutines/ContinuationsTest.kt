@@ -167,16 +167,16 @@ class ContinuationsTest {
         }
 
         mutableSetOf<Job>().let { jobs ->
-            val repeat = 5
-            repeat(repeat) {
+            repeat(5) {
                 launch {
                     continuations.await()
                 }.also { job ->
                     jobs.add(job)
                 }
             }
-            assertEquals(repeat, jobs.size)
+            assertEquals(5, jobs.size)
             delay(1_000)
+
             continuations.resume(Unit)
             jobs.joinAll()
             assertEquals(1, count.get())
@@ -193,6 +193,7 @@ class ContinuationsTest {
             }
             assertEquals(repeat, jobs.size)
             delay(1_000)
+
             continuations.resume(Unit)
             jobs.joinAll()
             assertEquals(2, count.get())
