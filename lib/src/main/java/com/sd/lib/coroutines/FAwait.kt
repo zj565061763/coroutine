@@ -17,7 +17,7 @@ suspend fun <T> fAwait(
 
 private class SafeCancellableContinuation<T>(
     private val onError: (Throwable) -> Unit,
-    private val continuation: CancellableContinuation<T>
+    private val continuation: CancellableContinuation<T>,
 ) : CancellableContinuation<T> by continuation {
     override fun resumeWith(result: Result<T>) {
         try {
