@@ -18,6 +18,7 @@ class SampleSyncable : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
         _binding.btnSync.setOnClickListener {
+            logMsg { "click sync" }
             _syncable.sync()
         }
         _binding.btnSyncAwait.setOnClickListener {
