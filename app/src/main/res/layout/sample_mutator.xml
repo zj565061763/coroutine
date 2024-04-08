@@ -26,4 +26,11 @@
         android:text="cancel"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btn_cancelAndJoin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cancelAndJoin"
+        android:textAllCaps="false" />
+
 </LinearLayout>
