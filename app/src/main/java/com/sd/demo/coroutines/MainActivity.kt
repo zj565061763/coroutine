@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         _binding.btnSampleMutator.setOnClickListener {
             startActivity(Intent(this, SampleMutator::class.java))
         }
-        _binding.btnSampleContinuation.setOnClickListener {
+        _binding.btnSampleContinuations.setOnClickListener {
             startActivity(Intent(this, SampleContinuations::class.java))
         }
         _binding.btnSampleSyncable.setOnClickListener {

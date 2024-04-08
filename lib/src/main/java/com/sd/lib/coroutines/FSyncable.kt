@@ -38,7 +38,7 @@ private class SyncableImpl<T>(
 
     private val _syncFlag = AtomicBoolean(false)
 
-    private val _continuation = object : FContinuations<Result<T>>() {
+    private val _continuations = object : FContinuations<Result<T>>() {
         override fun onFirstAwait() {
             startSync()
         }
@@ -49,7 +49,7 @@ private class SyncableImpl<T>(
     }
 
     override suspend fun syncAwait(): Result<T> {
-        return _continuation.await()
+        return _continuations.await()
     }
 
     private fun startSync() {
@@ -58,13 +58,13 @@ private class SyncableImpl<T>(
                 try {
                     val data = onSync()
                     currentCoroutineContext().ensureActive()
-                    _continuation.resume(Result.success(data))
+                    _continuations.resume(Result.success(data))
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
-                        _continuation.cancel()
+                        _continuations.cancel()
                         throw e
                     } else {
-                        _continuation.resume(Result.failure(e))
+                        _continuations.resume(Result.failure(e))
                     }
                 } finally {
                     _syncFlag.set(false)
@@ -73,7 +73,7 @@ private class SyncableImpl<T>(
         }
 
         if (!scope.isActive) {
-            _continuation.cancel()
+            _continuations.cancel()
         }
     }
 }

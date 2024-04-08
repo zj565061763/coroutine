@@ -20,10 +20,10 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_SampleContinuation"
+        android:id="@+id/btn_SampleContinuations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SampleContinuation"
+        android:text="SampleContinuations"
         android:textAllCaps="false" />
 
     <Button
