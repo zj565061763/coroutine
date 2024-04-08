@@ -71,32 +71,6 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test cancel outside`(): Unit = runBlocking {
-        val continuations = FContinuations<Int>()
-
-        val count = AtomicInteger(0)
-        val jobs = mutableSetOf<Job>()
-
-        repeat(5) {
-            launch {
-                val result = continuations.await()
-                count.updateAndGet { it + result }
-            }.also { job ->
-                jobs.add(job)
-            }
-        }
-
-        assertEquals(5, jobs.size)
-        delay(1_000)
-
-        // cancel outside
-        jobs.forEach { it.cancel() }
-
-        jobs.joinAll()
-        assertEquals(0, count.get())
-    }
-
-    @Test
     fun `test cancel inside`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
@@ -153,6 +127,32 @@ class ContinuationsTest {
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
+        assertEquals(0, count.get())
+    }
+
+    @Test
+    fun `test cancel outside`(): Unit = runBlocking {
+        val continuations = FContinuations<Int>()
+
+        val count = AtomicInteger(0)
+        val jobs = mutableSetOf<Job>()
+
+        repeat(5) {
+            launch {
+                val result = continuations.await()
+                count.updateAndGet { it + result }
+            }.also { job ->
+                jobs.add(job)
+            }
+        }
+
+        assertEquals(5, jobs.size)
+        delay(1_000)
+
+        // cancel outside
+        jobs.forEach { it.cancel() }
+
+        jobs.joinAll()
         assertEquals(0, count.get())
     }
 
