@@ -3,14 +3,14 @@ package com.sd.demo.coroutines
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.sd.demo.coroutines.databinding.SampleContinuationBinding
+import com.sd.demo.coroutines.databinding.SampleContinuationsBinding
 import com.sd.lib.coroutines.FContinuations
 import com.sd.lib.coroutines.FScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
-class SampleContinuation : AppCompatActivity() {
-    private val _binding by lazy { SampleContinuationBinding.inflate(layoutInflater) }
+class SampleContinuations : AppCompatActivity() {
+    private val _binding by lazy { SampleContinuationsBinding.inflate(layoutInflater) }
 
     private val _scope = FScope(lifecycleScope)
 
