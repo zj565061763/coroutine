@@ -64,6 +64,14 @@ class FMutator {
 
     //-------------------- ext --------------------
 
+    fun cancel() {
+        while (true) {
+            val mutator = currentMutator.get() ?: return
+            mutator.cancel()
+            currentMutator.compareAndSet(mutator, null)
+        }
+    }
+
     suspend fun cancelAndJoin() {
         while (true) {
             val mutator = currentMutator.get() ?: return
