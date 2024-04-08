@@ -49,7 +49,7 @@ class ContinuationsTest {
             launch {
                 val result = try {
                     continuations.await()
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     assertEquals("resumeWithException1", e.message)
                     1
                 }
@@ -110,7 +110,7 @@ class ContinuationsTest {
             launch {
                 val result = try {
                     continuations.await()
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     assertEquals("cancel with cause 1", e.message)
                     1
                 }
@@ -198,5 +198,37 @@ class ContinuationsTest {
             jobs.joinAll()
             assertEquals(2, count.get())
         }
+    }
+
+    @Test
+    fun `test onFirstAwait resume`(): Unit = runBlocking {
+        val continuations = object : FContinuations<Int>() {
+            override fun onFirstAwait() {
+                // resume
+                resume(1)
+                resume(2)
+            }
+        }
+        assertEquals(1, continuations.await())
+    }
+
+    @Test
+    fun `test onFirstAwait resumeWithException`(): Unit = runBlocking {
+        val continuations = object : FContinuations<Int>() {
+            override fun onFirstAwait() {
+                // resumeWithException
+                resumeWithException(Exception("resumeWithException1"))
+                resumeWithException(Exception("resumeWithException2"))
+            }
+        }
+
+        val result = try {
+            continuations.await()
+        } catch (e: Throwable) {
+            assertEquals("resumeWithException1", e.message)
+            1
+        }
+
+        assertEquals(1, result)
     }
 }

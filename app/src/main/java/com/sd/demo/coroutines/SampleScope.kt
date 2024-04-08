@@ -30,8 +30,8 @@ class SampleScope : AppCompatActivity() {
 
         try {
             delay(10_000)
-        } catch (e: Exception) {
-            logMsg { "$tag Exception:$e $uuid" }
+        } catch (e: Throwable) {
+            logMsg { "$tag error:$e $uuid" }
             throw e
         }
 

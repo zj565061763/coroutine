@@ -46,8 +46,8 @@ class SampleContinuations : AppCompatActivity() {
 
         val result = try {
             _continuations.await()
-        } catch (e: Exception) {
-            logMsg { "$tag Exception:$e $uuid" }
+        } catch (e: Throwable) {
+            logMsg { "$tag error:$e $uuid" }
             throw e
         }
 
