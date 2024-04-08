@@ -5,11 +5,11 @@ plugins {
 }
 
 val libGroupId = "com.sd.lib.android"
-val libArtifactId = "coroutine"
+val libArtifactId = "coroutines"
 val libVersionName = "1.5.5"
 
 android {
-    namespace = "com.sd.lib.coroutine"
+    namespace = "com.sd.lib.coroutines"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
         minSdk = 21

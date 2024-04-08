@@ -1,10 +1,10 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.sd.demo.coroutine.databinding.SampleMutatorBinding
-import com.sd.lib.coroutine.FMutator
+import com.sd.demo.coroutines.databinding.SampleMutatorBinding
+import com.sd.lib.coroutines.FMutator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID

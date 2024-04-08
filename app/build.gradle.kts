@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    namespace ="com.sd.demo.coroutine"
+    namespace = "com.sd.demo.coroutines"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
         targetSdk = libs.versions.androidCompileSdk.get().toInt()
         minSdk = 21
-        applicationId ="com.sd.demo.coroutine"
-        versionCode= 1
-        versionName= "1.0"
+        applicationId = "com.sd.demo.coroutines"
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

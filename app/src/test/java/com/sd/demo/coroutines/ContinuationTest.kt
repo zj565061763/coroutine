@@ -1,6 +1,6 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
-import com.sd.lib.coroutine.FContinuation
+import com.sd.lib.coroutines.FContinuation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay

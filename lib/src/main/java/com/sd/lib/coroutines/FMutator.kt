@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sd.lib.coroutine
+package com.sd.lib.coroutines
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

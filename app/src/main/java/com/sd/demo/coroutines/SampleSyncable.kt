@@ -1,10 +1,10 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.sd.demo.coroutine.databinding.SampleSyncableBinding
-import com.sd.lib.coroutine.FSyncable
+import com.sd.demo.coroutines.databinding.SampleSyncableBinding
+import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID

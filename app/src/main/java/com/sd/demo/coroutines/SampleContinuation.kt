@@ -1,11 +1,11 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.sd.demo.coroutine.databinding.SampleContinuationBinding
-import com.sd.lib.coroutine.FContinuation
-import com.sd.lib.coroutine.FScope
+import com.sd.demo.coroutines.databinding.SampleContinuationBinding
+import com.sd.lib.coroutines.FContinuation
+import com.sd.lib.coroutines.FScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 

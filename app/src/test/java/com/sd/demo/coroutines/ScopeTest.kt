@@ -1,6 +1,6 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
-import com.sd.lib.coroutine.FScope
+import com.sd.lib.coroutines.FScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob

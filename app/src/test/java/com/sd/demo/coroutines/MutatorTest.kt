@@ -1,6 +1,6 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
-import com.sd.lib.coroutine.FMutator
+import com.sd.lib.coroutines.FMutator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay

@@ -1,6 +1,6 @@
-package com.sd.demo.coroutine
+package com.sd.demo.coroutines
 
-import com.sd.lib.coroutine.FSyncable
+import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
