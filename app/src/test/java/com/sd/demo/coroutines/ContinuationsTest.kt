@@ -53,7 +53,7 @@ class ContinuationsTest {
                     continuations.await()
                 } catch (e: Exception) {
                     assertEquals("resumeWithException1", e.message)
-                    0
+                    1
                 }
                 count.updateAndGet { it + result }
             }.also { job ->
@@ -70,7 +70,7 @@ class ContinuationsTest {
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCompleted) }
-        assertEquals(0, count.get())
+        assertEquals(5, count.get())
     }
 
     @Test
