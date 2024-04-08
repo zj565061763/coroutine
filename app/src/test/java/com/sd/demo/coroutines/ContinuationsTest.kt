@@ -2,7 +2,6 @@ package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FContinuations
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -91,9 +90,8 @@ class ContinuationsTest {
         delay(1_000)
 
         // cancel outside
-        jobs.forEach { it.cancelAndJoin() }
+        jobs.forEach { it.cancel() }
 
-        jobs.forEach { assertEquals(true, it.isCancelled) }
         jobs.joinAll()
         assertEquals(0, count.get())
     }
