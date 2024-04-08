@@ -49,11 +49,13 @@ class SyncableTest {
             currentCoroutineContext().cancel()
         }
 
-        try {
+        val result = try {
             syncable.syncAwait()
         } catch (e: Throwable) {
-            assertEquals(true, e is CancellationException)
+            Result.failure(e)
         }
+
+        assertEquals(true, result.exceptionOrNull()!! is CancellationException)
     }
 
     @Test
