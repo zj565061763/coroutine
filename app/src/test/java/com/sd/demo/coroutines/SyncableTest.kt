@@ -7,7 +7,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -49,13 +48,21 @@ class SyncableTest {
             currentCoroutineContext().cancel()
         }
 
-        val result = try {
+        try {
             syncable.syncAwait()
         } catch (e: Throwable) {
             Result.failure(e)
+        }.let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
         }
 
-        assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+        try {
+            syncable.syncAwait()
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }.let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+        }
     }
 
     @Test
@@ -63,25 +70,23 @@ class SyncableTest {
         val outScope = CoroutineScope(SupervisorJob())
 
         val syncable = FSyncable(scope = outScope) {
-            delay(Long.MAX_VALUE)
-            1
-        }
-
-        launch {
-            delay(1_000)
             outScope.cancel()
         }
 
         try {
             syncable.syncAwait()
         } catch (e: Throwable) {
-            assertEquals(true, e is CancellationException)
+            Result.failure(e)
+        }.let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
         }
 
         try {
             syncable.syncAwait()
         } catch (e: Throwable) {
-            assertEquals(true, e is CancellationException)
+            Result.failure(e)
+        }.let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
         }
     }
 }
