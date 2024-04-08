@@ -71,7 +71,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test cancel inside`(): Unit = runBlocking {
+    fun `test cancel`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
@@ -98,7 +98,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test cancel inside with cause`(): Unit = runBlocking {
+    fun `test cancel with cause`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
