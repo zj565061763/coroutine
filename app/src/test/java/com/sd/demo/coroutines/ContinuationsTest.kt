@@ -72,7 +72,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test cancel`(): Unit = runBlocking {
+    fun `test cancelAll`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
@@ -90,7 +90,7 @@ class ContinuationsTest {
         assertEquals(5, jobs.size)
         delay(1_000)
 
-        // cancel
+        // cancelAll
         continuations.cancelAll()
         continuations.cancelAll()
 
@@ -100,7 +100,7 @@ class ContinuationsTest {
     }
 
     @Test
-    fun `test cancel with cause`(): Unit = runBlocking {
+    fun `test cancelAll with cause`(): Unit = runBlocking {
         val continuations = FContinuations<Int>()
 
         val count = AtomicInteger(0)
@@ -112,7 +112,7 @@ class ContinuationsTest {
                 val result = try {
                     continuations.await()
                 } catch (e: Throwable) {
-                    assertEquals("cancel with cause 1", e.message)
+                    assertEquals("cancelAll with cause 1", e.message)
                     1
                 }
                 count.updateAndGet { it + result }
@@ -124,9 +124,9 @@ class ContinuationsTest {
         assertEquals(repeat, jobs.size)
         delay(1_000)
 
-        // cancel with cause
-        continuations.cancelAll(Exception("cancel with cause 1"))
-        continuations.cancelAll(Exception("cancel with cause 2"))
+        // cancelAll with cause
+        continuations.cancelAll(Exception("cancelAll with cause 1"))
+        continuations.cancelAll(Exception("cancelAll with cause 2"))
 
         jobs.joinAll()
         assertEquals(5, count.get())
@@ -205,7 +205,7 @@ class ContinuationsTest {
     fun `test onFirstAwait resume`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
-                // resume
+                // resumeAll
                 resumeAll(1)
                 resumeAll(2)
             }
@@ -217,16 +217,16 @@ class ContinuationsTest {
     fun `test onFirstAwait resumeWithException`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
-                // resumeWithException
-                resumeAllWithException(Exception("resumeWithException1"))
-                resumeAllWithException(Exception("resumeWithException2"))
+                // resumeAllWithException
+                resumeAllWithException(Exception("resumeAllWithException 1"))
+                resumeAllWithException(Exception("resumeAllWithException 2"))
             }
         }
 
         val result = try {
             continuations.await()
         } catch (e: Throwable) {
-            assertEquals("resumeWithException1", e.message)
+            assertEquals("resumeAllWithException 1", e.message)
             1
         }
 
@@ -237,7 +237,7 @@ class ContinuationsTest {
     fun `test onFirstAwait cancel`(): Unit = runBlocking {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
-                // cancel
+                // cancelAll
                 cancelAll()
             }
         }
