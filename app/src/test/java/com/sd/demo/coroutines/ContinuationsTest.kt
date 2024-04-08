@@ -239,12 +239,33 @@ class ContinuationsTest {
             override fun onFirstAwait() {
                 // cancelAll
                 cancelAll()
+                cancelAll()
             }
         }
 
         val result = try {
             continuations.await()
         } catch (e: CancellationException) {
+            1
+        }
+
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun `test onFirstAwait cancelAll with cause`(): Unit = runBlocking {
+        val continuations = object : FContinuations<Int>() {
+            override fun onFirstAwait() {
+                // cancelAll with cause
+                cancelAll(Exception("cancelAll with cause 1"))
+                cancelAll(Exception("cancelAll with cause 2"))
+            }
+        }
+
+        val result = try {
+            continuations.await()
+        } catch (e: Throwable) {
+            assertEquals("cancelAll with cause 1", e.message)
             1
         }
 
