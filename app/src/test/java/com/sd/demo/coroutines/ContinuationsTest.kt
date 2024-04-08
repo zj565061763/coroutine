@@ -89,7 +89,8 @@ class ContinuationsTest {
         assertEquals(5, jobs.size)
         delay(1_000)
 
-        // cancel inside
+        // cancel
+        continuations.cancel()
         continuations.cancel()
 
         jobs.joinAll()
@@ -110,8 +111,8 @@ class ContinuationsTest {
                 val result = try {
                     continuations.await()
                 } catch (e: Exception) {
-                    assertEquals("cancel with cause", e.message)
-                    0
+                    assertEquals("cancel with cause 1", e.message)
+                    1
                 }
                 count.updateAndGet { it + result }
             }.also { job ->
@@ -122,11 +123,11 @@ class ContinuationsTest {
         assertEquals(repeat, jobs.size)
         delay(1_000)
 
-        // cancel inside with cause
-        continuations.cancel(Exception("cancel with cause"))
+        // cancel with cause
+        continuations.cancel(Exception("cancel with cause 1"))
+        continuations.cancel(Exception("cancel with cause 2"))
 
         jobs.joinAll()
-        jobs.forEach { assertEquals(true, it.isCompleted) }
         assertEquals(0, count.get())
     }
 
