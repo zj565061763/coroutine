@@ -1,6 +1,6 @@
 package com.sd.demo.coroutines
 
-import com.sd.lib.coroutines.FContinuation
+import com.sd.lib.coroutines.FContinuations
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -11,10 +11,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-class ContinuationTest {
+class ContinuationsTest {
     @Test
     fun `test resume`(): Unit = runBlocking {
-        val continuation = FContinuation<Int>()
+        val continuation = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -42,7 +42,7 @@ class ContinuationTest {
 
     @Test
     fun `test resumeWithException`(): Unit = runBlocking {
-        val continuation = FContinuation<Int>()
+        val continuation = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -75,7 +75,7 @@ class ContinuationTest {
 
     @Test
     fun `test cancel outside`(): Unit = runBlocking {
-        val continuation = FContinuation<Int>()
+        val continuation = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -101,7 +101,7 @@ class ContinuationTest {
 
     @Test
     fun `test cancel inside`(): Unit = runBlocking {
-        val continuation = FContinuation<Int>()
+        val continuation = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -129,7 +129,7 @@ class ContinuationTest {
 
     @Test
     fun `test cancel inside with cause`(): Unit = runBlocking {
-        val continuation = FContinuation<Int>()
+        val continuation = FContinuations<Int>()
 
         val count = AtomicInteger(0)
         val jobs = mutableSetOf<Job>()
@@ -163,7 +163,7 @@ class ContinuationTest {
     @Test
     fun `test onFirstAwait`(): Unit = runBlocking {
         val count = AtomicInteger(0)
-        val continuation = object : FContinuation<Unit>() {
+        val continuation = object : FContinuations<Unit>() {
             override fun onFirstAwait() {
                 count.incrementAndGet()
             }

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.sd.demo.coroutines.databinding.SampleContinuationBinding
-import com.sd.lib.coroutines.FContinuation
+import com.sd.lib.coroutines.FContinuations
 import com.sd.lib.coroutines.FScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
@@ -14,7 +14,7 @@ class SampleContinuation : AppCompatActivity() {
 
     private val _scope = FScope(lifecycleScope)
 
-    private val _continuation = object : FContinuation<String>() {
+    private val _continuation = object : FContinuations<String>() {
         override fun onFirstAwait() {
             logMsg { "onFirstAwait ${Thread.currentThread().name}" }
         }

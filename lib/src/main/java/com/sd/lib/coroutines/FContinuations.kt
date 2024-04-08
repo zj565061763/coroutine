@@ -5,12 +5,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-open class FContinuation<T> {
+open class FContinuations<T> {
     private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
     suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
-            synchronized(this@FContinuation) {
+            synchronized(this@FContinuations) {
                 if (_holder.add(cont)) {
                     if (_holder.size == 1 && cont.isActive) {
                         onFirstAwait()
@@ -18,7 +18,7 @@ open class FContinuation<T> {
                 }
             }
             cont.invokeOnCancellation {
-                synchronized(this@FContinuation) {
+                synchronized(this@FContinuations) {
                     _holder.remove(cont)
                 }
             }
@@ -44,7 +44,7 @@ open class FContinuation<T> {
     }
 
     private fun foreach(block: (CancellableContinuation<T>) -> Unit) {
-        synchronized(this@FContinuation) {
+        synchronized(this@FContinuations) {
             while (_holder.isNotEmpty()) {
                 _holder.toTypedArray().forEach { cont ->
                     _holder.remove(cont)

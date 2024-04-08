@@ -38,7 +38,7 @@ private class SyncableImpl<T>(
 
     private val _syncFlag = AtomicBoolean(false)
 
-    private val _continuation = object : FContinuation<Result<T>>() {
+    private val _continuation = object : FContinuations<Result<T>>() {
         override fun onFirstAwait() {
             startSync()
         }
