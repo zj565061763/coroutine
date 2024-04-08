@@ -34,9 +34,10 @@ class SampleMutator : AppCompatActivity() {
             }
         }
         _binding.btnCancel.setOnClickListener {
-            logMsg { "click cancel" }
             lifecycleScope.launch {
+                logMsg { "cancelAndJoin start" }
                 _mutator.cancelAndJoin()
+                logMsg { "cancelAndJoin end" }
             }
         }
     }
