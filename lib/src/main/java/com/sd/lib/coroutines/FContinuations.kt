@@ -11,10 +11,8 @@ open class FContinuations<T> {
     suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
             synchronized(this@FContinuations) {
-                if (_holder.add(cont)) {
-                    if (_holder.size == 1 && cont.isActive) {
-                        onFirstAwait()
-                    }
+                if (_holder.add(cont) && _holder.size == 1) {
+                    onFirstAwait()
                 }
             }
             cont.invokeOnCancellation {
