@@ -31,7 +31,7 @@ open class FContinuations<T> {
         }
     }
 
-    fun resumeWithException(exception: Throwable) {
+    fun resumeAllWithException(exception: Throwable) {
         foreach {
             it.resumeWithException(exception)
         }
