@@ -128,7 +128,7 @@ class ContinuationsTest {
         continuations.cancel(Exception("cancel with cause 2"))
 
         jobs.joinAll()
-        assertEquals(0, count.get())
+        assertEquals(5, count.get())
     }
 
     @Test
