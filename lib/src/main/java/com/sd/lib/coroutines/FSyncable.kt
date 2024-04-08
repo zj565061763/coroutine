@@ -61,7 +61,7 @@ private class SyncableImpl<T>(
                     _continuations.resumeAll(Result.success(data))
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
-                        _continuations.cancel()
+                        _continuations.cancelAll()
                         throw e
                     } else {
                         _continuations.resumeAll(Result.failure(e))
@@ -73,7 +73,7 @@ private class SyncableImpl<T>(
         }
 
         if (!scope.isActive) {
-            _continuations.cancel()
+            _continuations.cancelAll()
         }
     }
 }

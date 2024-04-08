@@ -91,8 +91,8 @@ class ContinuationsTest {
         delay(1_000)
 
         // cancel
-        continuations.cancel()
-        continuations.cancel()
+        continuations.cancelAll()
+        continuations.cancelAll()
 
         jobs.joinAll()
         jobs.forEach { assertEquals(true, it.isCancelled) }
@@ -125,8 +125,8 @@ class ContinuationsTest {
         delay(1_000)
 
         // cancel with cause
-        continuations.cancel(Exception("cancel with cause 1"))
-        continuations.cancel(Exception("cancel with cause 2"))
+        continuations.cancelAll(Exception("cancel with cause 1"))
+        continuations.cancelAll(Exception("cancel with cause 2"))
 
         jobs.joinAll()
         assertEquals(5, count.get())
@@ -238,7 +238,7 @@ class ContinuationsTest {
         val continuations = object : FContinuations<Int>() {
             override fun onFirstAwait() {
                 // cancel
-                cancel()
+                cancelAll()
             }
         }
 

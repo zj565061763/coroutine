@@ -26,13 +26,13 @@ class SampleContinuations : AppCompatActivity() {
         _binding.btnLaunch.setOnClickListener {
             _scope.launch(Dispatchers.IO) { start("launch") }
         }
-        _binding.btnResume.setOnClickListener {
-            logMsg { "click resume" }
+        _binding.btnResumeContinuations.setOnClickListener {
+            logMsg { "click resume continuations" }
             _continuations.resumeAll("hello")
         }
         _binding.btnCancelContinuations.setOnClickListener {
             logMsg { "click cancel continuations" }
-            _continuations.cancel()
+            _continuations.cancelAll()
         }
         _binding.btnCancelLaunch.setOnClickListener {
             logMsg { "click cancel launch" }

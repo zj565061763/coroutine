@@ -37,7 +37,7 @@ open class FContinuations<T> {
         }
     }
 
-    fun cancel(cause: Throwable? = null) {
+    fun cancelAll(cause: Throwable? = null) {
         foreach {
             it.cancel(cause)
         }

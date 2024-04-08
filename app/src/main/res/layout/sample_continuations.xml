@@ -13,10 +13,10 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/btn_resume"
+        android:id="@+id/btn_resume_continuations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="resume"
+        android:text="resume continuations"
         android:textAllCaps="false" />
 
     <Button
