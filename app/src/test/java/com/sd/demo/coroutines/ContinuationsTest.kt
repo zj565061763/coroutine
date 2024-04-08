@@ -1,6 +1,7 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FContinuations
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
@@ -226,6 +227,24 @@ class ContinuationsTest {
             continuations.await()
         } catch (e: Throwable) {
             assertEquals("resumeWithException1", e.message)
+            1
+        }
+
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun `test onFirstAwait cancel`(): Unit = runBlocking {
+        val continuations = object : FContinuations<Int>() {
+            override fun onFirstAwait() {
+                // cancel
+                cancel()
+            }
+        }
+
+        val result = try {
+            continuations.await()
+        } catch (e: CancellationException) {
             1
         }
 
