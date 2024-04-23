@@ -3,6 +3,9 @@ package com.sd.lib.coroutines
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 
+/**
+ * 挂起当前协程，执行[block]
+ */
 suspend fun <T> fAwait(
     onError: (Throwable) -> Unit = { it.printStackTrace() },
     block: (CancellableContinuation<T>) -> Unit,

@@ -8,6 +8,9 @@ import kotlin.coroutines.resumeWithException
 open class FContinuations<T> {
     private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
+    /**
+     * 挂起当前协程，等待结果[T]
+     */
     suspend fun await(): T {
         return suspendCancellableCoroutine { cont ->
             synchronized(this@FContinuations) {
@@ -23,18 +26,27 @@ open class FContinuations<T> {
         }
     }
 
+    /**
+     * 恢复所有挂起的协程
+     */
     fun resumeAll(value: T) {
         foreach {
             it.resume(value)
         }
     }
 
+    /**
+     * 恢复所有挂起的协程，并在挂起点抛出异常[exception]
+     */
     fun resumeAllWithException(exception: Throwable) {
         foreach {
             it.resumeWithException(exception)
         }
     }
 
+    /**
+     * 取消所有挂起的协程
+     */
     fun cancelAll(cause: Throwable? = null) {
         foreach {
             it.cancel(cause)
