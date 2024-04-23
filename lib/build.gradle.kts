@@ -6,7 +6,7 @@ plugins {
 
 val libGroupId = "com.sd.lib.android"
 val libArtifactId = "coroutines"
-val libVersionName = "1.6.1"
+val libVersionName = "1.6.2"
 
 android {
     namespace = "com.sd.lib.coroutines"
