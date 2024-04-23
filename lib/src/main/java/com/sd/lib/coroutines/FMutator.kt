@@ -47,7 +47,7 @@ class FMutator {
 
     suspend fun <R> mutate(
         priority: Int = 0,
-        block: suspend () -> R
+        block: suspend () -> R,
     ) = coroutineScope {
         val mutator = Mutator(priority, coroutineContext[Job]!!)
 
@@ -64,6 +64,9 @@ class FMutator {
 
     //-------------------- ext --------------------
 
+    /**
+     * 取消所有[mutate]任务
+     */
     fun cancel() {
         while (true) {
             val mutator = currentMutator.get() ?: return
@@ -72,6 +75,9 @@ class FMutator {
         }
     }
 
+    /**
+     * 取消所有[mutate]任务，并等待取消完成
+     */
     suspend fun cancelAndJoin() {
         while (true) {
             val mutator = currentMutator.get() ?: return
