@@ -33,7 +33,7 @@ class SampleSyncable : AppCompatActivity() {
         logMsg { "syncAwait start $uuid" }
 
         val result = try {
-            _syncable.syncAwait()
+            _syncable.syncWithResult()
         } catch (e: Throwable) {
             logMsg { "syncAwait error:$e $uuid" }
             throw e
