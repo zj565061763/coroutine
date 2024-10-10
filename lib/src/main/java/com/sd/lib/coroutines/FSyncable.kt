@@ -25,12 +25,12 @@ fun <T> FSyncable(
 private class SyncableImpl<T>(
    private val onSync: suspend () -> T,
 ) : FSyncable<T> {
-
+   private val _dispatcher = Dispatchers.fMain
    private var _isSync = false
    private val _continuations = FContinuations<Result<T>>()
 
    override suspend fun sync(): Result<T> {
-      return withContext(Dispatchers.fMain) {
+      return withContext(_dispatcher) {
          if (_isSync) {
             _continuations.await()
          } else {
