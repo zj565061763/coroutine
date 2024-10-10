@@ -22,13 +22,19 @@ class SyncableTest {
 
    @Test
    fun `test sync success`(): Unit = runTest {
-      val syncable = FSyncable { 1 }
+      val syncable = FSyncable {
+         delay(1_000)
+         1
+      }
       assertEquals(1, syncable.sync().getOrThrow())
    }
 
    @Test
    fun `test sync failure`(): Unit = runTest {
-      val syncable = FSyncable { error("sync failure") }
+      val syncable = FSyncable {
+         delay(1_000)
+         error("sync failure")
+      }
       assertEquals("sync failure", syncable.sync().exceptionOrNull()!!.message)
    }
 
@@ -42,13 +48,13 @@ class SyncableTest {
       }
 
       launch {
-         syncable.sync()
+         assertEquals(1, syncable.sync().getOrThrow())
       }
 
       delay(1_000)
       repeat(3) {
          launch {
-            syncable.sync()
+            assertEquals(1, syncable.sync().getOrThrow())
          }
       }
 
@@ -64,9 +70,12 @@ class SyncableTest {
       }
 
       launch {
-         syncable.sync().let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+         val result = try {
+            syncable.sync()
+         } catch (e: Throwable) {
+            e
          }
+         assertEquals(true, result is CancellationException)
       }
    }
 
