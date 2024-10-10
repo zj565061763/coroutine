@@ -2,24 +2,27 @@ package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
 class SyncableTest {
+   @get:Rule
+   val mainDispatcherRule = MainDispatcherRule()
 
    @Test
-   fun `test sync success`(): Unit = runBlocking {
+   fun `test sync success`(): Unit = runTest {
       val count = AtomicInteger(0)
 
-      val syncable = FSyncable(scope = this) {
-         delay(1_000)
+      val syncable = FSyncable {
+         delay(10)
          count.incrementAndGet()
       }
 
@@ -29,8 +32,8 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync failure`(): Unit = runBlocking {
-      val syncable = FSyncable(scope = this) {
+   fun `test sync failure`(): Unit = runTest {
+      val syncable = FSyncable {
          error("failure")
       }
 
@@ -40,50 +43,36 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel onSync`(): Unit = runBlocking {
-      val syncable = FSyncable(scope = this) {
+   fun `test cancel onSync`(): Unit = runTest {
+      val syncable = FSyncable {
+         delay(10)
          currentCoroutineContext().cancel()
       }
 
-      try {
-         syncable.sync()
-      } catch (e: Throwable) {
-         Result.failure(e)
-      }.let { result ->
-         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-      }
-
-      try {
-         syncable.sync()
-      } catch (e: Throwable) {
-         Result.failure(e)
-      }.let { result ->
-         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      launch {
+         syncable.sync().let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+         }
       }
    }
 
    @Test
-   fun `test cancel scope`(): Unit = runBlocking {
-      val outScope = CoroutineScope(SupervisorJob())
+   fun `test cancel scope`(): Unit = runTest {
+      val outScope = TestScope()
 
-      val syncable = FSyncable(scope = outScope) {
+      val syncable = FSyncable {
+         delay(10)
          outScope.cancel()
       }
 
-      try {
-         syncable.sync()
-      } catch (e: Throwable) {
-         Result.failure(e)
-      }.let { result ->
-         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-      }
-
-      try {
-         syncable.sync()
-      } catch (e: Throwable) {
-         Result.failure(e)
-      }.let { result ->
-         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      outScope.launch {
+         try {
+            syncable.sync()
+         } catch (e: Throwable) {
+            Result.failure(e)
+         }.let { result ->
+            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+         }
       }
    }
 }

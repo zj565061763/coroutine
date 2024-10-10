@@ -1,13 +1,10 @@
 package com.sd.lib.coroutines
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.withContext
 
 interface FSyncable<T> {
    /**
@@ -17,58 +14,48 @@ interface FSyncable<T> {
 }
 
 /**
- * 当[FSyncable.sync]触发时回调[onSync]，[onSync]在[scope]上面执行，执行完成后会唤醒[FSyncable.sync]挂起的协程，
- * 如果[onSync]或者[scope]被取消，则[FSyncable.sync]挂起的协程会被取消。
+ * 调用[FSyncable.sync]时会回调[onSync]，
+ * 如果执行未完成时又有新协程调用[FSyncable.sync]，则新协程会挂起，执行完成后会唤醒挂起的新协程，
+ * 如果执行失败或者被取消，则挂起的新协程收到的[Result]包含失败或者[CancellationException]异常。
  */
 fun <T> FSyncable(
-   scope: CoroutineScope = MainScope(),
    onSync: suspend () -> T,
-): FSyncable<T> {
-   return SyncableImpl(
-      scope = scope,
-      onSync = onSync,
-   )
-}
+): FSyncable<T> = SyncableImpl(onSync = onSync)
 
 private class SyncableImpl<T>(
-   private val scope: CoroutineScope,
    private val onSync: suspend () -> T,
 ) : FSyncable<T> {
 
-   private val _syncFlag = AtomicBoolean(false)
-
-   private val _continuations = object : FContinuations<Result<T>>() {
-      override fun onFirstAwait() {
-         startSync()
-      }
-   }
+   private var _isSync = false
+   private val _continuations = FContinuations<Result<T>>()
 
    override suspend fun sync(): Result<T> {
-      return _continuations.await()
-   }
-
-   private fun startSync() {
-      scope.launch {
-         if (_syncFlag.compareAndSet(false, true)) {
-            try {
-               val data = onSync()
-               currentCoroutineContext().ensureActive()
-               _continuations.resumeAll(Result.success(data))
-            } catch (e: Throwable) {
-               if (e is CancellationException) {
-                  _continuations.cancelAll()
-                  throw e
-               } else {
-                  _continuations.resumeAll(Result.failure(e))
+      return withContext(Dispatchers.Main) {
+         if (_isSync) {
+            _continuations.await()
+         } else {
+            startSync()
+               .onSuccess {
+                  _continuations.resumeAll(Result.success(it))
                }
-            } finally {
-               _syncFlag.set(false)
-            }
+               .onFailure {
+                  _continuations.resumeAll(Result.failure(it))
+                  if (it is CancellationException) throw it
+               }
          }
       }
+   }
 
-      if (!scope.isActive) {
-         _continuations.cancelAll()
+   private suspend fun startSync(): Result<T> {
+      check(!_isSync)
+      _isSync = true
+      return runCatching {
+         onSync().also {
+            currentCoroutineContext().ensureActive()
+         }
+      }.also {
+         check(_isSync)
+         _isSync = false
       }
    }
 }
