@@ -34,7 +34,7 @@ private class SyncableImpl<T>(
          if (_isSync) {
             _continuations.await()
          } else {
-            startSync()
+            startSync().also { check(!_isSync) }
                .onSuccess {
                   _continuations.resumeAll(Result.success(it))
                }
