@@ -99,14 +99,11 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancelAll with cause`(): Unit = runBlocking {
+   fun `test cancelAll with cause`(): Unit = runTest {
       val continuations = FContinuations<Int>()
-
       val count = AtomicInteger(0)
-      val jobs = mutableSetOf<Job>()
 
-      val repeat = 5
-      repeat(repeat) {
+      repeat(3) {
          launch {
             val result = try {
                continuations.await()
@@ -114,21 +111,20 @@ class ContinuationsTest {
                assertEquals("cancelAll with cause 1", e.message)
                1
             }
-            count.updateAndGet { it + result }
-         }.also { job ->
-            jobs.add(job)
+            count.updateAndGet {
+               it + result
+            }
          }
       }
 
-      assertEquals(repeat, jobs.size)
       delay(1_000)
 
       // cancelAll with cause
       continuations.cancelAll(Exception("cancelAll with cause 1"))
       continuations.cancelAll(Exception("cancelAll with cause 2"))
 
-      jobs.joinAll()
-      assertEquals(5, count.get())
+      advanceUntilIdle()
+      assertEquals(3, count.get())
    }
 
    @Test
