@@ -18,29 +18,28 @@ class SampleSyncable : AppCompatActivity() {
       super.onCreate(savedInstanceState)
       setContentView(_binding.root)
       _binding.btnSync.setOnClickListener {
-         logMsg { "click sync" }
          lifecycleScope.launch {
-            syncAwait()
+            sync()
          }
       }
    }
 
-   private suspend fun syncAwait() {
+   private suspend fun sync() {
       val uuid = UUID.randomUUID().toString()
-      logMsg { "syncAwait start $uuid" }
+      logMsg { "sync start $uuid" }
 
       val result = try {
          _syncable.sync()
       } catch (e: Throwable) {
-         logMsg { "syncAwait error:$e $uuid" }
+         logMsg { "sync error:$e $uuid" }
          throw e
       }
 
       result.onSuccess {
-         logMsg { "syncAwait onSuccess $it $uuid" }
+         logMsg { "sync onSuccess $it $uuid" }
       }
       result.onFailure {
-         logMsg { "syncAwait onFailure $it $uuid" }
+         logMsg { "sync onFailure $it $uuid" }
       }
    }
 
