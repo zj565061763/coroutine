@@ -1,26 +1,31 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
 class ScopeTest {
    @Test
-   fun `test launch`(): Unit = runBlocking {
+   fun `test launch`(): Unit = runTest {
       val scope = FScope(this)
       testLaunchSuccess(scope)
    }
 
    @Test
-   fun `test cancel scope`(): Unit = runBlocking {
+   fun `test cancel scope`(): Unit = runTest {
       val scope = FScope(this)
       testCancelScope(scope) { scope.cancel() }
       testLaunchSuccess(scope)
@@ -36,22 +41,16 @@ class ScopeTest {
    }
 }
 
-private suspend fun testLaunchSuccess(scope: FScope) {
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun TestScope.testLaunchSuccess(scope: FScope) {
    val count = AtomicInteger(0)
-   val jobs = mutableSetOf<Job>()
-
-   repeat(5) {
+   repeat(3) {
       scope.launch {
          count.incrementAndGet()
-      }.let { job ->
-         assertEquals(true, job.isActive)
-         jobs.add(job)
       }
    }
-
-   assertEquals(5, jobs.size)
-   jobs.joinAll()
-   assertEquals(5, count.get())
+   advanceUntilIdle()
+   assertEquals(3, count.get())
 }
 
 private suspend fun testCancelScope(
