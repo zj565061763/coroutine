@@ -8,6 +8,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -65,37 +66,62 @@ class SyncableTest {
    @Test
    fun `test cancel onSync`(): Unit = runTest {
       val syncable = FSyncable {
-         delay(10)
+         delay(5_000)
          currentCoroutineContext().cancel()
       }
 
       launch {
-         val result = try {
+         val result: Any = try {
             syncable.sync()
          } catch (e: Throwable) {
             e
          }
          assertEquals(true, result is CancellationException)
       }
+
+      delay(1_000)
+      repeat(3) {
+         launch {
+            val result: Any = try {
+               syncable.sync()
+            } catch (e: Throwable) {
+               e
+            }
+            assertEquals(true, (result as Result<*>).exceptionOrNull()!! is CancellationException)
+         }
+      }
    }
 
    @Test
-   fun `test cancel scope`(): Unit = runTest {
-      val outScope = TestScope()
+   fun `test cancel first sync`(): Unit = runTest {
+      val scope = TestScope()
 
       val syncable = FSyncable {
-         delay(10)
-         outScope.cancel()
+         delay(Long.MAX_VALUE)
       }
 
-      outScope.launch {
-         try {
+      scope.launch {
+         val result: Any = try {
             syncable.sync()
          } catch (e: Throwable) {
-            Result.failure(e)
-         }.let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+            e
+         }
+         assertEquals(true, result is CancellationException)
+      }
+
+      delay(1_000)
+      repeat(3) {
+         launch {
+            val result: Any = try {
+               syncable.sync()
+            } catch (e: Throwable) {
+               e
+            }
+            assertEquals(true, (result as Result<*>).exceptionOrNull()!! is CancellationException)
          }
       }
+
+      delay(1_000)
+      scope.cancel()
    }
 }
