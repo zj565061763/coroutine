@@ -2,21 +2,24 @@ package com.sd.lib.coroutines
 
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class FContinuations<T> {
-   private val _holder: MutableSet<CancellableContinuation<T>> = Collections.synchronizedSet(mutableSetOf())
+   private val _holder: MutableSet<CancellableContinuation<T>> = mutableSetOf()
 
    /**
     * 挂起当前协程，等待结果[T]
     */
    suspend fun await(): T {
       return suspendCancellableCoroutine { cont ->
-         _holder.add(cont)
+         synchronized(this@FContinuations) {
+            _holder.add(cont)
+         }
          cont.invokeOnCancellation {
-            _holder.remove(cont)
+            synchronized(this@FContinuations) {
+               _holder.remove(cont)
+            }
          }
       }
    }
@@ -49,11 +52,10 @@ class FContinuations<T> {
    }
 
    private inline fun foreach(block: (CancellableContinuation<T>) -> Unit) {
-      while (_holder.isNotEmpty()) {
-         _holder.toTypedArray().forEach { cont ->
-            _holder.remove(cont)
-            block(cont)
+      synchronized(this@FContinuations) {
+         _holder.toTypedArray().also {
+            _holder.clear()
          }
-      }
+      }.forEach(block)
    }
 }
