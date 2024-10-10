@@ -1,7 +1,6 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FScope
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -9,7 +8,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -32,7 +30,7 @@ class ScopeTest {
    }
 
    @Test
-   fun `test cancel out scope`(): Unit = runBlocking {
+   fun `test cancel out scope`(): Unit = runTest {
       val outScope = CoroutineScope(SupervisorJob())
       val scope = FScope(outScope)
 
@@ -44,11 +42,13 @@ class ScopeTest {
 @OptIn(ExperimentalCoroutinesApi::class)
 private fun TestScope.testLaunchSuccess(scope: FScope) {
    val count = AtomicInteger(0)
+
    repeat(3) {
       scope.launch {
          count.incrementAndGet()
       }
    }
+
    advanceUntilIdle()
    assertEquals(3, count.get())
 }
@@ -59,7 +59,7 @@ private suspend fun testCancelScope(
 ) {
    val jobs = mutableSetOf<Job>()
 
-   repeat(5) {
+   repeat(3) {
       scope.launch {
          delay(Long.MAX_VALUE)
       }.let { job ->
@@ -68,7 +68,7 @@ private suspend fun testCancelScope(
       }
    }
 
-   assertEquals(5, jobs.size)
+   assertEquals(3, jobs.size)
    delay(1_000)
 
    // cancel scope
