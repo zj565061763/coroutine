@@ -11,14 +11,8 @@ import java.util.UUID
 
 class SampleContinuations : AppCompatActivity() {
    private val _binding by lazy { SampleContinuationsBinding.inflate(layoutInflater) }
-
    private val _scope = FScope(lifecycleScope)
-
-   private val _continuations = object : FContinuations<String>() {
-      override fun onFirstAwait() {
-         logMsg { "onFirstAwait ${Thread.currentThread().name}" }
-      }
-   }
+   private val _continuations = FContinuations<String>()
 
    override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)

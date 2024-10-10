@@ -11,7 +11,6 @@ import java.util.UUID
 
 class SampleMutator : AppCompatActivity() {
    private val _binding by lazy { SampleMutatorBinding.inflate(layoutInflater) }
-
    private val _mutator = FMutator()
 
    override fun onCreate(savedInstanceState: Bundle?) {

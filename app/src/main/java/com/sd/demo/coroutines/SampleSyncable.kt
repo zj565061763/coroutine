@@ -11,7 +11,6 @@ import java.util.UUID
 
 class SampleSyncable : AppCompatActivity() {
    private val _binding by lazy { SampleSyncableBinding.inflate(layoutInflater) }
-
    private val _syncable = FSyncable { loadData() }
 
    override fun onCreate(savedInstanceState: Bundle?) {

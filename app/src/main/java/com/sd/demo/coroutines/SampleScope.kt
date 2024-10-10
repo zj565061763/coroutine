@@ -10,7 +10,6 @@ import java.util.UUID
 
 class SampleScope : AppCompatActivity() {
    private val _binding by lazy { SampleScopeBinding.inflate(layoutInflater) }
-
    private val _scope = FScope(lifecycleScope)
 
    override fun onCreate(savedInstanceState: Bundle?) {
