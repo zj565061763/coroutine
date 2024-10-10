@@ -1,40 +1,39 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FContinuations
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ContinuationsTest {
    @Test
-   fun `test resumeAll`(): Unit = runBlocking {
+   fun `test resumeAll`(): Unit = runTest {
       val continuations = FContinuations<Int>()
-
       val count = AtomicInteger(0)
-      val jobs = mutableSetOf<Job>()
 
       repeat(5) {
          launch {
             val result = continuations.await()
             count.updateAndGet { it + result }
-         }.also { job ->
-            jobs.add(job)
          }
       }
 
-      assertEquals(5, jobs.size)
       delay(1_000)
 
       // resumeAll
       continuations.resumeAll(1)
       continuations.resumeAll(2)
 
-      jobs.joinAll()
+      advanceUntilIdle()
       assertEquals(5, count.get())
    }
 
