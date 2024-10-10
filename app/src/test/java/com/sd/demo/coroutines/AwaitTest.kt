@@ -1,7 +1,7 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.fAwait
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
@@ -9,7 +9,7 @@ import kotlin.coroutines.resume
 
 class AwaitTest {
    @Test
-   fun `test resume`(): Unit = runBlocking {
+   fun `test resume`(): Unit = runTest {
       val count = AtomicInteger(0)
       val result = fAwait(
          onError = { count.incrementAndGet() },
