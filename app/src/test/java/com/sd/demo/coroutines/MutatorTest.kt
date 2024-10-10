@@ -5,7 +5,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -56,7 +55,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test cancel`(): Unit = runBlocking {
+   fun `test cancel`(): Unit = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -74,7 +73,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test cancelAndJoin`(): Unit = runBlocking {
+   fun `test cancelAndJoin`(): Unit = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
