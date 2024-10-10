@@ -6,12 +6,13 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class MutatorTest {
    @Test
-   fun `test mutate`(): Unit = runBlocking {
+   fun `test mutate`(): Unit = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -24,7 +25,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test mutate high priority`(): Unit = runBlocking {
+   fun `test mutate high priority`(): Unit = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -37,19 +38,18 @@ class MutatorTest {
    }
 
    @Test
-   fun `test mutate cancel self`(): Unit = runBlocking {
+   fun `test mutate cancel self`(): Unit = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
       }.let { job ->
          delay(1_000)
-         val result = try {
+         val result: Any = try {
             mutator.mutate(-1) { }
-            "mutate"
-         } catch (e: CancellationException) {
-            "CancellationException"
+         } catch (e: Throwable) {
+            e
          }
-         assertEquals(result, "CancellationException")
+         assertEquals(true, result is CancellationException)
          assertEquals(true, job.isActive)
          job.cancelAndJoin()
       }
