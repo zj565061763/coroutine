@@ -7,7 +7,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.Collections
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -37,7 +36,7 @@ fun FScope(
 private class ScopeImpl(
    private val scope: CoroutineScope,
 ) : FScope {
-   private val _holder: MutableSet<Job> = Collections.synchronizedSet(mutableSetOf())
+   private val _holder: MutableSet<Job> = mutableSetOf()
 
    override fun launch(
       context: CoroutineContext,
@@ -49,20 +48,23 @@ private class ScopeImpl(
          start = start,
          block = block,
       ).also { job ->
-         _holder.add(job)
+         synchronized(this@ScopeImpl) {
+            _holder.add(job)
+         }
          job.invokeOnCompletion {
-            _holder.remove(job)
+            synchronized(this@ScopeImpl) {
+               _holder.remove(job)
+            }
          }
       }
    }
 
    override fun cancel() {
-      while (_holder.isNotEmpty()) {
-         _holder.toTypedArray().forEach { job ->
-            _holder.remove(job)
-            job.cancel()
+      synchronized(this@ScopeImpl) {
+         _holder.toTypedArray().also {
+            _holder.clear()
          }
-      }
+      }.forEach { it.cancel() }
    }
 }
 
