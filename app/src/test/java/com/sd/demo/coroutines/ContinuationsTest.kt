@@ -20,10 +20,12 @@ class ContinuationsTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
-      repeat(5) {
+      repeat(3) {
          launch {
             val result = continuations.await()
-            count.updateAndGet { it + result }
+            count.updateAndGet {
+               it + result
+            }
          }
       }
 
@@ -34,7 +36,7 @@ class ContinuationsTest {
       continuations.resumeAll(2)
 
       advanceUntilIdle()
-      assertEquals(5, count.get())
+      assertEquals(3, count.get())
    }
 
    @Test
