@@ -5,6 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 
 interface FSyncable<T> {
    /**
@@ -30,6 +32,9 @@ private class SyncableImpl<T>(
    private val _continuations = FContinuations<Result<T>>()
 
    override suspend fun sync(): Result<T> {
+      if (currentCoroutineContext()[SyncElement] != null) {
+         throw ReSyncException("Can not call sync() in the onSync block.")
+      }
       return withContext(_dispatcher) {
          if (_isSync) {
             _continuations.await()
@@ -39,6 +44,7 @@ private class SyncableImpl<T>(
                   _continuations.resumeAll(Result.success(it))
                }
                .onFailure {
+                  if (it is ReSyncException) throw it
                   _continuations.resumeAll(Result.failure(it))
                   if (it is CancellationException) throw it
                }
@@ -50,8 +56,12 @@ private class SyncableImpl<T>(
       check(!_isSync)
       _isSync = true
       return runCatching {
-         onSync().also {
-            currentCoroutineContext().ensureActive()
+         (currentCoroutineContext() + SyncElement()).let { newContext ->
+            withContext(newContext) {
+               onSync()
+            }.also {
+               currentCoroutineContext().ensureActive()
+            }
          }
       }.also {
          check(_isSync)
@@ -59,3 +69,9 @@ private class SyncableImpl<T>(
       }
    }
 }
+
+private class SyncElement : AbstractCoroutineContextElement(SyncElement) {
+   companion object Key : CoroutineContext.Key<SyncElement>
+}
+
+private class ReSyncException(message: String) : RuntimeException(message)
