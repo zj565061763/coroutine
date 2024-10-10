@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    `maven-publish`
+   alias(libs.plugins.android.library)
+   alias(libs.plugins.kotlin.android)
+   `maven-publish`
 }
 
 val libGroupId = "com.sd.lib.android"
@@ -9,41 +9,42 @@ val libArtifactId = "coroutines"
 val libVersionName = "1.6.3"
 
 android {
-    namespace = "com.sd.lib.coroutines"
-    compileSdk = libs.versions.androidCompileSdk.get().toInt()
-    defaultConfig {
-        minSdk = 21
-    }
+   namespace = "com.sd.lib.coroutines"
+   compileSdk = libs.versions.androidCompileSdk.get().toInt()
+   defaultConfig {
+      minSdk = 21
+   }
 
-    kotlinOptions {
-        freeCompilerArgs += "-module-name=$libGroupId.$libArtifactId"
-    }
+   compileOptions {
+      sourceCompatibility = JavaVersion.VERSION_1_8
+      targetCompatibility = JavaVersion.VERSION_1_8
+   }
 
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
-}
+   kotlinOptions {
+      jvmTarget = "1.8"
+      freeCompilerArgs += "-module-name=$libGroupId.$libArtifactId"
+   }
 
-kotlin {
-    jvmToolchain(8)
+   publishing {
+      singleVariant("release") {
+         withSourcesJar()
+      }
+   }
 }
 
 dependencies {
-    api(libs.kotlinx.coroutines)
+   api(libs.kotlinx.coroutines)
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = libGroupId
-            artifactId = libArtifactId
-            version = libVersionName
-
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
-    }
+   publications {
+      create<MavenPublication>("release") {
+         groupId = libGroupId
+         artifactId = libArtifactId
+         version = libVersionName
+         afterEvaluate {
+            from(components["release"])
+         }
+      }
+   }
 }
