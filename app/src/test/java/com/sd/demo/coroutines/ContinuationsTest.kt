@@ -134,7 +134,12 @@ class ContinuationsTest {
       val scope = TestScope(testScheduler)
       repeat(3) {
          scope.launch {
-            val result = continuations.await()
+            val result = try {
+               continuations.await()
+            } catch (e: Throwable) {
+               assertEquals(true, e is CancellationException)
+               1
+            }
             count.updateAndGet {
                it + result
             }
@@ -147,6 +152,6 @@ class ContinuationsTest {
       scope.cancel()
 
       advanceUntilIdle()
-      assertEquals(0, count.get())
+      assertEquals(3, count.get())
    }
 }
