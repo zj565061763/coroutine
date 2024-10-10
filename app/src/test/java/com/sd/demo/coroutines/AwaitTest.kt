@@ -8,21 +8,21 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 
 class AwaitTest {
-    @Test
-    fun `test resume`(): Unit = runBlocking {
-        val count = AtomicInteger(0)
-        val result = fAwait(
-            onError = { count.incrementAndGet() },
-        ) { cont ->
-            cont.resume(1)
+   @Test
+   fun `test resume`(): Unit = runBlocking {
+      val count = AtomicInteger(0)
+      val result = fAwait(
+         onError = { count.incrementAndGet() },
+      ) { cont ->
+         cont.resume(1)
 
-            // onError
-            cont.resume(2)
-            // onError
-            cont.resume(3)
-        }
+         // onError
+         cont.resume(2)
+         // onError
+         cont.resume(3)
+      }
 
-        assertEquals(1, result)
-        assertEquals(2, count.get())
-    }
+      assertEquals(1, result)
+      assertEquals(2, count.get())
+   }
 }

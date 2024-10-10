@@ -14,79 +14,79 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class SyncableTest {
 
-    @Test
-    fun `test sync success`(): Unit = runBlocking {
-        val count = AtomicInteger(0)
+   @Test
+   fun `test sync success`(): Unit = runBlocking {
+      val count = AtomicInteger(0)
 
-        val syncable = FSyncable(scope = this) {
-            delay(1_000)
-            count.incrementAndGet()
-        }
+      val syncable = FSyncable(scope = this) {
+         delay(1_000)
+         count.incrementAndGet()
+      }
 
-        syncable.sync()
-        syncable.sync()
+      syncable.sync()
+      syncable.sync()
 
-        assertEquals(1, syncable.syncWithResult().getOrThrow())
-        assertEquals(2, syncable.syncWithResult().getOrThrow())
-        assertEquals(3, syncable.syncWithResult().getOrThrow())
-    }
+      assertEquals(1, syncable.syncWithResult().getOrThrow())
+      assertEquals(2, syncable.syncWithResult().getOrThrow())
+      assertEquals(3, syncable.syncWithResult().getOrThrow())
+   }
 
-    @Test
-    fun `test sync failure`(): Unit = runBlocking {
-        val syncable = FSyncable(scope = this) {
-            error("failure")
-        }
+   @Test
+   fun `test sync failure`(): Unit = runBlocking {
+      val syncable = FSyncable(scope = this) {
+         error("failure")
+      }
 
-        syncable.syncWithResult().let { result ->
-            assertEquals("failure", result.exceptionOrNull()!!.message)
-        }
-    }
+      syncable.syncWithResult().let { result ->
+         assertEquals("failure", result.exceptionOrNull()!!.message)
+      }
+   }
 
-    @Test
-    fun `test cancel onSync`(): Unit = runBlocking {
-        val syncable = FSyncable(scope = this) {
-            currentCoroutineContext().cancel()
-        }
+   @Test
+   fun `test cancel onSync`(): Unit = runBlocking {
+      val syncable = FSyncable(scope = this) {
+         currentCoroutineContext().cancel()
+      }
 
-        try {
-            syncable.syncWithResult()
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }.let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-        }
+      try {
+         syncable.syncWithResult()
+      } catch (e: Throwable) {
+         Result.failure(e)
+      }.let { result ->
+         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      }
 
-        try {
-            syncable.syncWithResult()
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }.let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-        }
-    }
+      try {
+         syncable.syncWithResult()
+      } catch (e: Throwable) {
+         Result.failure(e)
+      }.let { result ->
+         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      }
+   }
 
-    @Test
-    fun `test cancel scope`(): Unit = runBlocking {
-        val outScope = CoroutineScope(SupervisorJob())
+   @Test
+   fun `test cancel scope`(): Unit = runBlocking {
+      val outScope = CoroutineScope(SupervisorJob())
 
-        val syncable = FSyncable(scope = outScope) {
-            outScope.cancel()
-        }
+      val syncable = FSyncable(scope = outScope) {
+         outScope.cancel()
+      }
 
-        try {
-            syncable.syncWithResult()
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }.let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-        }
+      try {
+         syncable.syncWithResult()
+      } catch (e: Throwable) {
+         Result.failure(e)
+      }.let { result ->
+         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      }
 
-        try {
-            syncable.syncWithResult()
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }.let { result ->
-            assertEquals(true, result.exceptionOrNull()!! is CancellationException)
-        }
-    }
+      try {
+         syncable.syncWithResult()
+      } catch (e: Throwable) {
+         Result.failure(e)
+      }.let { result ->
+         assertEquals(true, result.exceptionOrNull()!! is CancellationException)
+      }
+   }
 }

@@ -9,32 +9,32 @@ import kotlinx.coroutines.delay
 import java.util.UUID
 
 class SampleScope : AppCompatActivity() {
-    private val _binding by lazy { SampleScopeBinding.inflate(layoutInflater) }
+   private val _binding by lazy { SampleScopeBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope(lifecycleScope)
+   private val _scope = FScope(lifecycleScope)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(_binding.root)
-        _binding.btnLaunch.setOnClickListener {
-            _scope.launch { start("launch") }
-        }
-        _binding.btnCancel.setOnClickListener {
-            _scope.cancel()
-        }
-    }
+   override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+      setContentView(_binding.root)
+      _binding.btnLaunch.setOnClickListener {
+         _scope.launch { start("launch") }
+      }
+      _binding.btnCancel.setOnClickListener {
+         _scope.cancel()
+      }
+   }
 
-    private suspend fun start(tag: String) {
-        val uuid = UUID.randomUUID().toString()
-        logMsg { "$tag start $uuid" }
+   private suspend fun start(tag: String) {
+      val uuid = UUID.randomUUID().toString()
+      logMsg { "$tag start $uuid" }
 
-        try {
-            delay(10_000)
-        } catch (e: Throwable) {
-            logMsg { "$tag error:$e $uuid" }
-            throw e
-        }
+      try {
+         delay(10_000)
+      } catch (e: Throwable) {
+         logMsg { "$tag error:$e $uuid" }
+         throw e
+      }
 
-        logMsg { "$tag finish $uuid" }
-    }
+      logMsg { "$tag finish $uuid" }
+   }
 }

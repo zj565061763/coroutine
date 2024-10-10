@@ -24,77 +24,77 @@ import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
 
 class FMutator {
-    private class Mutator(val priority: Int, val job: Job) {
-        fun canInterrupt(other: Mutator) = priority >= other.priority
+   private class Mutator(val priority: Int, val job: Job) {
+      fun canInterrupt(other: Mutator) = priority >= other.priority
 
-        fun cancel() = job.cancel(MutationInterruptedException())
-    }
+      fun cancel() = job.cancel(MutationInterruptedException())
+   }
 
-    private val currentMutator = AtomicReference<Mutator?>(null)
-    private val mutex = Mutex()
+   private val currentMutator = AtomicReference<Mutator?>(null)
+   private val mutex = Mutex()
 
-    private fun tryMutateOrCancel(mutator: Mutator) {
-        while (true) {
-            val oldMutator = currentMutator.get()
-            if (oldMutator == null || mutator.canInterrupt(oldMutator)) {
-                if (currentMutator.compareAndSet(oldMutator, mutator)) {
-                    oldMutator?.cancel()
-                    break
-                }
-            } else throw CancellationException("Current mutation had a higher priority")
-        }
-    }
-
-    suspend fun <R> mutate(
-        priority: Int = 0,
-        block: suspend () -> R,
-    ) = coroutineScope {
-        val mutator = Mutator(priority, coroutineContext[Job]!!)
-
-        tryMutateOrCancel(mutator)
-
-        mutex.withLock {
-            try {
-                block()
-            } finally {
-                currentMutator.compareAndSet(mutator, null)
+   private fun tryMutateOrCancel(mutator: Mutator) {
+      while (true) {
+         val oldMutator = currentMutator.get()
+         if (oldMutator == null || mutator.canInterrupt(oldMutator)) {
+            if (currentMutator.compareAndSet(oldMutator, mutator)) {
+               oldMutator?.cancel()
+               break
             }
-        }
-    }
+         } else throw CancellationException("Current mutation had a higher priority")
+      }
+   }
 
-    //-------------------- ext --------------------
+   suspend fun <R> mutate(
+      priority: Int = 0,
+      block: suspend () -> R,
+   ) = coroutineScope {
+      val mutator = Mutator(priority, coroutineContext[Job]!!)
 
-    /**
-     * 取消所有[mutate]任务
-     */
-    fun cancel() {
-        while (true) {
-            val mutator = currentMutator.get() ?: return
-            mutator.cancel()
+      tryMutateOrCancel(mutator)
+
+      mutex.withLock {
+         try {
+            block()
+         } finally {
             currentMutator.compareAndSet(mutator, null)
-        }
-    }
+         }
+      }
+   }
 
-    /**
-     * 取消所有[mutate]任务，并等待取消完成
-     */
-    suspend fun cancelAndJoin() {
-        while (true) {
-            val mutator = currentMutator.get() ?: return
-            mutator.cancel()
-            try {
-                mutator.job.join()
-            } finally {
-                currentMutator.compareAndSet(mutator, null)
-            }
-        }
-    }
+   //-------------------- ext --------------------
+
+   /**
+    * 取消所有[mutate]任务
+    */
+   fun cancel() {
+      while (true) {
+         val mutator = currentMutator.get() ?: return
+         mutator.cancel()
+         currentMutator.compareAndSet(mutator, null)
+      }
+   }
+
+   /**
+    * 取消所有[mutate]任务，并等待取消完成
+    */
+   suspend fun cancelAndJoin() {
+      while (true) {
+         val mutator = currentMutator.get() ?: return
+         mutator.cancel()
+         try {
+            mutator.job.join()
+         } finally {
+            currentMutator.compareAndSet(mutator, null)
+         }
+      }
+   }
 }
 
 private class MutationInterruptedException : CancellationException("Mutation interrupted") {
-    override fun fillInStackTrace(): Throwable {
-        // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
-        stackTrace = emptyArray()
-        return this
-    }
+   override fun fillInStackTrace(): Throwable {
+      // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
+      stackTrace = emptyArray()
+      return this
+   }
 }

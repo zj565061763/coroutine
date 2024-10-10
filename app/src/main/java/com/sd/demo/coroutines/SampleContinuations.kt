@@ -10,47 +10,47 @@ import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
 class SampleContinuations : AppCompatActivity() {
-    private val _binding by lazy { SampleContinuationsBinding.inflate(layoutInflater) }
+   private val _binding by lazy { SampleContinuationsBinding.inflate(layoutInflater) }
 
-    private val _scope = FScope(lifecycleScope)
+   private val _scope = FScope(lifecycleScope)
 
-    private val _continuations = object : FContinuations<String>() {
-        override fun onFirstAwait() {
-            logMsg { "onFirstAwait ${Thread.currentThread().name}" }
-        }
-    }
+   private val _continuations = object : FContinuations<String>() {
+      override fun onFirstAwait() {
+         logMsg { "onFirstAwait ${Thread.currentThread().name}" }
+      }
+   }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(_binding.root)
-        _binding.btnLaunch.setOnClickListener {
-            _scope.launch(Dispatchers.IO) { start("launch") }
-        }
-        _binding.btnResumeContinuations.setOnClickListener {
-            logMsg { "click resume continuations" }
-            _continuations.resumeAll("hello")
-        }
-        _binding.btnCancelContinuations.setOnClickListener {
-            logMsg { "click cancel continuations" }
-            _continuations.cancelAll()
-        }
-        _binding.btnCancelLaunch.setOnClickListener {
-            logMsg { "click cancel launch" }
-            _scope.cancel()
-        }
-    }
+   override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+      setContentView(_binding.root)
+      _binding.btnLaunch.setOnClickListener {
+         _scope.launch(Dispatchers.IO) { start("launch") }
+      }
+      _binding.btnResumeContinuations.setOnClickListener {
+         logMsg { "click resume continuations" }
+         _continuations.resumeAll("hello")
+      }
+      _binding.btnCancelContinuations.setOnClickListener {
+         logMsg { "click cancel continuations" }
+         _continuations.cancelAll()
+      }
+      _binding.btnCancelLaunch.setOnClickListener {
+         logMsg { "click cancel launch" }
+         _scope.cancel()
+      }
+   }
 
-    private suspend fun start(tag: String) {
-        val uuid = UUID.randomUUID().toString()
-        logMsg { "$tag start $uuid" }
+   private suspend fun start(tag: String) {
+      val uuid = UUID.randomUUID().toString()
+      logMsg { "$tag start $uuid" }
 
-        val result = try {
-            _continuations.await()
-        } catch (e: Throwable) {
-            logMsg { "$tag error:$e $uuid" }
-            throw e
-        }
+      val result = try {
+         _continuations.await()
+      } catch (e: Throwable) {
+         logMsg { "$tag error:$e $uuid" }
+         throw e
+      }
 
-        logMsg { "$tag finish ($result) $uuid" }
-    }
+      logMsg { "$tag finish ($result) $uuid" }
+   }
 }
