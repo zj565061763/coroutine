@@ -14,9 +14,9 @@ interface FSyncable<T> {
 }
 
 /**
- * 调用[FSyncable.sync]时会回调[onSync]，
- * 如果执行未完成时又有新协程调用[FSyncable.sync]，则新协程会挂起，执行完成后会唤醒挂起的新协程，
- * 如果执行失败或者被取消，则挂起的新协程收到的[Result]包含失败或者[CancellationException]异常。
+ * 如果调用[FSyncable.sync]时，[FSyncable]处于空闲状态，则会在当前协程切换到[Dispatchers.Main]上执行[onSync]，
+ * 如果执行未完成时又有新协程调用[FSyncable.sync]，则新协程会挂起等待结果，
+ * 如果执行发生异常(包括取消异常)，则新协程收到的[Result]包含该异常。
  */
 fun <T> FSyncable(
    onSync: suspend () -> T,
