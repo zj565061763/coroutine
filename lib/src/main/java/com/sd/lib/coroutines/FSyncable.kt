@@ -25,8 +25,8 @@ fun <T> FSyncable(
 private class SyncableImpl<T>(
    private val onSync: suspend () -> T,
 ) : FSyncable<T> {
-   private val _dispatcher = Dispatchers.fMain
    private var _isSync = false
+   private val _dispatcher = Dispatchers.fMain
    private val _continuations = FContinuations<Result<T>>()
 
    override suspend fun sync(): Result<T> {
