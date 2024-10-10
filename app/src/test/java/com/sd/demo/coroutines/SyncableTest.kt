@@ -93,7 +93,7 @@ class SyncableTest {
 
    @Test
    fun `test cancel first sync`(): Unit = runTest {
-      val scope = TestScope()
+      val scope = TestScope(testScheduler)
 
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
