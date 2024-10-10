@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.Collections
@@ -66,6 +67,8 @@ private class ScopeImpl(
 }
 
 fun fMainScope(): CoroutineScope {
-   val dispatcher = runCatching { Dispatchers.Main.immediate }.getOrDefault(Dispatchers.Main)
-   return CoroutineScope(SupervisorJob() + dispatcher)
+   return CoroutineScope(SupervisorJob() + Dispatchers.fMain)
 }
+
+val Dispatchers.fMain: MainCoroutineDispatcher
+   get() = runCatching { Main.immediate }.getOrDefault(Main)

@@ -14,7 +14,7 @@ interface FSyncable<T> {
 }
 
 /**
- * 如果调用[FSyncable.sync]时，[FSyncable]处于空闲状态，则会在当前协程切换到[Dispatchers.Main]上执行[onSync]，
+ * 如果调用[FSyncable.sync]时，[FSyncable]处于空闲状态，则会在当前协程切换到主线程执行[onSync]，
  * 如果执行未完成时又有新协程调用[FSyncable.sync]，则新协程会挂起等待结果，
  * 如果执行发生异常(包括取消异常)，则新协程收到的[Result]包含该异常。
  */
@@ -30,7 +30,7 @@ private class SyncableImpl<T>(
    private val _continuations = FContinuations<Result<T>>()
 
    override suspend fun sync(): Result<T> {
-      return withContext(Dispatchers.Main) {
+      return withContext(Dispatchers.fMain) {
          if (_isSync) {
             _continuations.await()
          } else {
