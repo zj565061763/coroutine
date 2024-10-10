@@ -56,12 +56,10 @@ private class SyncableImpl<T>(
       check(!_isSync)
       _isSync = true
       return runCatching {
-         (currentCoroutineContext() + SyncElement()).let { newContext ->
-            withContext(newContext) {
-               onSync()
-            }.also {
-               currentCoroutineContext().ensureActive()
-            }
+         withContext(SyncElement()) {
+            onSync()
+         }.also {
+            currentCoroutineContext().ensureActive()
          }
       }.also {
          check(_isSync)
