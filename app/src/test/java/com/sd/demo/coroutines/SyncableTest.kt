@@ -26,7 +26,8 @@ class SyncableTest {
          delay(1_000)
          1
       }
-      assertEquals(1, syncable.sync().getOrThrow())
+      val result = syncable.sync()
+      assertEquals(1, result.getOrThrow())
    }
 
    @Test
@@ -35,7 +36,8 @@ class SyncableTest {
          delay(1_000)
          error("sync failure")
       }
-      assertEquals("sync failure", syncable.sync().exceptionOrNull()!!.message)
+      val result = syncable.sync()
+      assertEquals("sync failure", result.exceptionOrNull()!!.message)
    }
 
    @Test
@@ -48,13 +50,15 @@ class SyncableTest {
       }
 
       launch {
-         assertEquals(1, syncable.sync().getOrThrow())
+         val result = syncable.sync()
+         assertEquals(1, result.getOrThrow())
       }
 
       delay(1_000)
       repeat(3) {
          launch {
-            assertEquals(1, syncable.sync().getOrThrow())
+            val result = syncable.sync()
+            assertEquals(1, result.getOrThrow())
          }
       }
 
