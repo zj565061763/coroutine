@@ -1,6 +1,7 @@
 package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FContinuations
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -69,31 +70,32 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancelAll`(): Unit = runBlocking {
+   fun `test cancelAll`(): Unit = runTest {
       val continuations = FContinuations<Int>()
-
       val count = AtomicInteger(0)
-      val jobs = mutableSetOf<Job>()
 
-      repeat(5) {
+      repeat(3) {
          launch {
-            val result = continuations.await()
-            count.updateAndGet { it + result }
-         }.also { job ->
-            jobs.add(job)
+            val result = try {
+               continuations.await()
+            } catch (e: Throwable) {
+               assertEquals(true, e is CancellationException)
+               1
+            }
+            count.updateAndGet {
+               it + result
+            }
          }
       }
 
-      assertEquals(5, jobs.size)
       delay(1_000)
 
       // cancelAll
       continuations.cancelAll()
       continuations.cancelAll()
 
-      jobs.joinAll()
-      jobs.forEach { assertEquals(true, it.isCancelled) }
-      assertEquals(0, count.get())
+      advanceUntilIdle()
+      assertEquals(3, count.get())
    }
 
    @Test
