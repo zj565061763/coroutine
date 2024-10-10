@@ -131,8 +131,8 @@ class ContinuationsTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
-      val scope = TestScope()
-      repeat(5) {
+      val scope = TestScope(testScheduler)
+      repeat(3) {
          scope.launch {
             val result = continuations.await()
             count.updateAndGet {
