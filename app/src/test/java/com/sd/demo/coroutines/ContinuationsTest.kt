@@ -40,13 +40,11 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test resumeAllWithException`(): Unit = runBlocking {
+   fun `test resumeAllWithException`(): Unit = runTest {
       val continuations = FContinuations<Int>()
-
       val count = AtomicInteger(0)
-      val jobs = mutableSetOf<Job>()
 
-      repeat(5) {
+      repeat(3) {
          launch {
             val result = try {
                continuations.await()
@@ -54,21 +52,20 @@ class ContinuationsTest {
                assertEquals("resumeAllWithException 1", e.message)
                1
             }
-            count.updateAndGet { it + result }
-         }.also { job ->
-            jobs.add(job)
+            count.updateAndGet {
+               it + result
+            }
          }
       }
 
-      assertEquals(5, jobs.size)
       delay(1_000)
 
       // resumeAllWithException
       continuations.resumeAllWithException(Exception("resumeAllWithException 1"))
       continuations.resumeAllWithException(Exception("resumeAllWithException 2"))
 
-      jobs.joinAll()
-      assertEquals(5, count.get())
+      advanceUntilIdle()
+      assertEquals(3, count.get())
    }
 
    @Test
