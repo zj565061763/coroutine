@@ -3,11 +3,10 @@ package com.sd.demo.coroutines
 import com.sd.lib.coroutines.FContinuations
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -128,28 +127,26 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancel outside`(): Unit = runBlocking {
+   fun `test cancel outside`(): Unit = runTest {
       val continuations = FContinuations<Int>()
-
       val count = AtomicInteger(0)
-      val jobs = mutableSetOf<Job>()
 
+      val scope = TestScope()
       repeat(5) {
-         launch {
+         scope.launch {
             val result = continuations.await()
-            count.updateAndGet { it + result }
-         }.also { job ->
-            jobs.add(job)
+            count.updateAndGet {
+               it + result
+            }
          }
       }
 
-      assertEquals(5, jobs.size)
       delay(1_000)
 
       // cancel outside
-      jobs.forEach { it.cancel() }
+      scope.cancel()
 
-      jobs.joinAll()
+      advanceUntilIdle()
       assertEquals(0, count.get())
    }
 }
