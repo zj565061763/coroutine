@@ -12,16 +12,15 @@ import java.util.UUID
 class SampleSyncable : AppCompatActivity() {
    private val _binding by lazy { SampleSyncableBinding.inflate(layoutInflater) }
 
-   private val _syncable = FSyncable(lifecycleScope) { loadData() }
+   private val _syncable = FSyncable(lifecycleScope) {
+      loadData()
+   }
 
    override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       setContentView(_binding.root)
       _binding.btnSync.setOnClickListener {
          logMsg { "click sync" }
-         _syncable.sync()
-      }
-      _binding.btnSyncAwait.setOnClickListener {
          lifecycleScope.launch {
             syncAwait()
          }
@@ -33,7 +32,7 @@ class SampleSyncable : AppCompatActivity() {
       logMsg { "syncAwait start $uuid" }
 
       val result = try {
-         _syncable.syncWithResult()
+         _syncable.sync()
       } catch (e: Throwable) {
          logMsg { "syncAwait error:$e $uuid" }
          throw e

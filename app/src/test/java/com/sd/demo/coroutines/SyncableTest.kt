@@ -23,12 +23,9 @@ class SyncableTest {
          count.incrementAndGet()
       }
 
-      syncable.sync()
-      syncable.sync()
-
-      assertEquals(1, syncable.syncWithResult().getOrThrow())
-      assertEquals(2, syncable.syncWithResult().getOrThrow())
-      assertEquals(3, syncable.syncWithResult().getOrThrow())
+      assertEquals(1, syncable.sync().getOrThrow())
+      assertEquals(2, syncable.sync().getOrThrow())
+      assertEquals(3, syncable.sync().getOrThrow())
    }
 
    @Test
@@ -37,7 +34,7 @@ class SyncableTest {
          error("failure")
       }
 
-      syncable.syncWithResult().let { result ->
+      syncable.sync().let { result ->
          assertEquals("failure", result.exceptionOrNull()!!.message)
       }
    }
@@ -49,7 +46,7 @@ class SyncableTest {
       }
 
       try {
-         syncable.syncWithResult()
+         syncable.sync()
       } catch (e: Throwable) {
          Result.failure(e)
       }.let { result ->
@@ -57,7 +54,7 @@ class SyncableTest {
       }
 
       try {
-         syncable.syncWithResult()
+         syncable.sync()
       } catch (e: Throwable) {
          Result.failure(e)
       }.let { result ->
@@ -74,7 +71,7 @@ class SyncableTest {
       }
 
       try {
-         syncable.syncWithResult()
+         syncable.sync()
       } catch (e: Throwable) {
          Result.failure(e)
       }.let { result ->
@@ -82,7 +79,7 @@ class SyncableTest {
       }
 
       try {
-         syncable.syncWithResult()
+         syncable.sync()
       } catch (e: Throwable) {
          Result.failure(e)
       }.let { result ->

@@ -11,20 +11,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 interface FSyncable<T> {
    /**
-    * 开始同步
-    */
-   fun sync()
-
-   /**
     * 开始同步并等待结果
     */
-   suspend fun syncWithResult(): Result<T>
+   suspend fun sync(): Result<T>
 }
 
 /**
- * 创建[FSyncable]，当[FSyncable.sync]或者[FSyncable.syncWithResult]触发时，回调[onSync]进行同步操作。
- * [onSync]在[scope]上面执行，执行完成后会唤醒[FSyncable.syncWithResult]挂起的协程，
- * 如果[onSync]或者[scope]被取消，则[FSyncable.syncWithResult]挂起的协程会被取消。
+ * 当[FSyncable.sync]触发时回调[onSync]，[onSync]在[scope]上面执行，执行完成后会唤醒[FSyncable.sync]挂起的协程，
+ * 如果[onSync]或者[scope]被取消，则[FSyncable.sync]挂起的协程会被取消。
  */
 fun <T> FSyncable(
    scope: CoroutineScope = MainScope(),
@@ -49,11 +43,7 @@ private class SyncableImpl<T>(
       }
    }
 
-   override fun sync() {
-      startSync()
-   }
-
-   override suspend fun syncWithResult(): Result<T> {
+   override suspend fun sync(): Result<T> {
       return _continuations.await()
    }
 
