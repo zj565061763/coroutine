@@ -30,10 +30,10 @@ interface FScope {
  * 创建[FScope]
  */
 fun FScope(
-   scope: CoroutineScope = fMainScope(),
+   scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.fMain),
 ): FScope = ScopeImpl(scope = scope)
 
-private class ScopeImpl(
+private open class ScopeImpl(
    private val scope: CoroutineScope,
 ) : FScope {
    private val _holder: MutableSet<Job> = mutableSetOf()
@@ -68,8 +68,16 @@ private class ScopeImpl(
    }
 }
 
-fun fMainScope(): CoroutineScope {
-   return CoroutineScope(SupervisorJob() + Dispatchers.fMain)
+/**
+ * 全局协程作用域，所有创建的协程只能通过对应的[Job]手动取消，
+ * 不能调用[FScope.cancel]取消，否则会抛异常
+ */
+val fGlobalScope: FScope = object : ScopeImpl(
+   scope = CoroutineScope(SupervisorJob() + Dispatchers.fMain)
+) {
+   override fun cancel() {
+      error("Can not cancel global scope.")
+   }
 }
 
 val Dispatchers.fMain: MainCoroutineDispatcher
