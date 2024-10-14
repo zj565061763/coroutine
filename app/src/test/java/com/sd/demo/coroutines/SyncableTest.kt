@@ -99,6 +99,7 @@ class SyncableTest {
       }
 
       advanceUntilIdle()
+      assertEquals(3, jobs.size)
       jobs.forEach {
          assertEquals(true, it.isCancelled)
       }
@@ -106,43 +107,41 @@ class SyncableTest {
 
    @Test
    fun `test cancel first sync`(): Unit = runTest {
-      val count = AtomicInteger()
-
       val syncable = FSyncable {
-         count.incrementAndGet()
          delay(Long.MAX_VALUE)
       }
 
-      val job = launch {
-         val result: Any = try {
-            syncable.syncWithResult()
-         } catch (e: Throwable) {
-            e
-         }
-         assertEquals(true, result is CancellationException)
-         count.incrementAndGet()
+      val job1 = launch {
+         syncable.syncWithResult()
       }.also {
-         // 等待第1个协程启动
+         // 确保第1个协程启动
          runCurrent()
+         assertEquals(true, it.isActive)
       }
 
-      launch {
-         val result: Any = try {
+      val jobs = mutableSetOf<Job>()
+      repeat(3) {
+         launch {
             syncable.syncWithResult()
-         } catch (e: Throwable) {
-            e
+         }.also {
+            jobs.add(it)
          }
-         assertEquals(true, result is CancellationException)
-         count.incrementAndGet()
-      }.also {
-         // 等待第2个协程启动
-         runCurrent()
       }
 
-      // 取消第一个协程
-      job.cancel()
+      runCurrent()
+      assertEquals(true, job1.isActive)
+      assertEquals(3, jobs.size)
+      jobs.forEach {
+         assertEquals(true, it.isActive)
+      }
 
+      job1.cancel()
       advanceUntilIdle()
-      assertEquals(3, count.get())
+      assertEquals(true, job1.isCancelled)
+
+      assertEquals(3, jobs.size)
+      jobs.forEach {
+         assertEquals(true, it.isCancelled)
+      }
    }
 }
