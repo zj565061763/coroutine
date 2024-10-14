@@ -10,6 +10,9 @@ import kotlin.coroutines.CoroutineContext
 
 interface FSyncable<T> {
    /** 同步并等待结果 */
+   suspend fun syncOrThrow(): T
+
+   /** 同步并等待结果 */
    suspend fun syncWithResult(): Result<T>
 }
 
@@ -25,40 +28,51 @@ private class SyncableImpl<T>(
    private val onSync: suspend () -> T,
 ) : FSyncable<T> {
    private var _isSync = false
-   private val _dispatcher = Dispatchers.fMain
    private val _continuations = FContinuations<Result<T>>()
+
+   override suspend fun syncOrThrow(): T {
+      return syncWithResult().getOrThrow()
+   }
 
    override suspend fun syncWithResult(): Result<T> {
       if (currentCoroutineContext()[SyncElement] != null) {
          throw ReSyncException("Can not call sync() in the onSync block.")
       }
-      return withContext(_dispatcher) {
+      return withContext(Dispatchers.fMain) {
          if (_isSync) {
             _continuations.await()
          } else {
-            startSync().also { check(!_isSync) }
-               .onSuccess {
-                  _continuations.resumeAll(Result.success(it))
+            runCatching { startSync() }.also { check(!_isSync) }
+               .onSuccess { data ->
+                  _continuations.resumeAll(Result.success(data))
                }
-               .onFailure {
-                  if (it is ReSyncException) throw it
-                  _continuations.resumeAll(Result.failure(it))
-                  if (it is CancellationException) throw it
+               .onFailure { error ->
+                  when (error) {
+                     is ReSyncException,
+                     is CancellationException,
+                        -> {
+                        _continuations.cancelAll()
+                        throw error
+                     }
+                     else -> {
+                        _continuations.resumeAll(Result.failure(error))
+                     }
+                  }
                }
          }
       }
    }
 
-   private suspend fun startSync(): Result<T> {
+   private suspend fun startSync(): T {
       check(!_isSync)
-      _isSync = true
-      return runCatching {
+      return try {
+         _isSync = true
          withContext(SyncElement()) {
             onSync()
          }.also {
             currentCoroutineContext().ensureActive()
          }
-      }.also {
+      } finally {
          check(_isSync)
          _isSync = false
       }
