@@ -26,7 +26,7 @@ class SyncableTest {
          delay(1_000)
          1
       }
-      val result = syncable.sync()
+      val result = syncable.syncWithResult()
       assertEquals(1, result.getOrThrow())
    }
 
@@ -36,7 +36,7 @@ class SyncableTest {
          delay(1_000)
          error("sync failure")
       }
-      val result = syncable.sync()
+      val result = syncable.syncWithResult()
       assertEquals("sync failure", result.exceptionOrNull()!!.message)
    }
 
@@ -50,14 +50,14 @@ class SyncableTest {
       }
 
       launch {
-         val result = syncable.sync()
+         val result = syncable.syncWithResult()
          assertEquals(1, result.getOrThrow())
       }
 
       delay(1_000)
       repeat(3) {
          launch {
-            val result = syncable.sync()
+            val result = syncable.syncWithResult()
             assertEquals(1, result.getOrThrow())
          }
       }
@@ -75,7 +75,7 @@ class SyncableTest {
 
       launch {
          val result: Any = try {
-            syncable.sync()
+            syncable.syncWithResult()
          } catch (e: Throwable) {
             e
          }
@@ -86,7 +86,7 @@ class SyncableTest {
       repeat(3) {
          launch {
             val result: Any = try {
-               syncable.sync()
+               syncable.syncWithResult()
             } catch (e: Throwable) {
                e
             }
@@ -105,7 +105,7 @@ class SyncableTest {
 
       scope.launch {
          val result: Any = try {
-            syncable.sync()
+            syncable.syncWithResult()
          } catch (e: Throwable) {
             e
          }
@@ -116,7 +116,7 @@ class SyncableTest {
       repeat(3) {
          launch {
             val result: Any = try {
-               syncable.sync()
+               syncable.syncWithResult()
             } catch (e: Throwable) {
                e
             }

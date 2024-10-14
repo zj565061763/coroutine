@@ -28,7 +28,7 @@ class SampleSyncable : AppCompatActivity() {
       logMsg { "sync start $uuid" }
 
       val result = try {
-         _syncable.sync()
+         _syncable.syncWithResult()
       } catch (e: Throwable) {
          logMsg { "sync error:$e $uuid" }
          throw e
