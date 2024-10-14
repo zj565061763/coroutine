@@ -65,11 +65,11 @@ class SyncableTest {
             val result = syncable.syncWithResult()
             assertEquals(1, result.getOrThrow())
             count.incrementAndGet()
-         }.also { job ->
-            assertEquals(true, job.isActive)
-            assertEquals(true, job1.isActive)
          }
       }
+
+      runCurrent()
+      assertEquals(true, job1.isActive)
 
       advanceUntilIdle()
       assertEquals(5, count.get())
