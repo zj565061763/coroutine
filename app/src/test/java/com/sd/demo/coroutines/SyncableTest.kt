@@ -49,21 +49,31 @@ class SyncableTest {
          count.incrementAndGet()
       }
 
-      launch {
+      // 第1个协程，执行真正的逻辑，并等待结果
+      val job1 = launch {
          val result = syncable.syncWithResult()
          assertEquals(1, result.getOrThrow())
+         count.incrementAndGet()
+      }.also {
+         runCurrent()
+         assertEquals(true, it.isActive)
       }
 
-      delay(1_000)
+      // 启动3个协程，等待结果
       repeat(3) {
          launch {
             val result = syncable.syncWithResult()
             assertEquals(1, result.getOrThrow())
+            count.incrementAndGet()
+         }.also { job ->
+            runCurrent()
+            assertEquals(true, job.isActive)
+            assertEquals(true, job1.isActive)
          }
       }
 
       advanceUntilIdle()
-      assertEquals(1, count.get())
+      assertEquals(5, count.get())
    }
 
    @Test
