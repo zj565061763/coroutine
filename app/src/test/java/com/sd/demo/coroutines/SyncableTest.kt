@@ -34,10 +34,10 @@ class SyncableTest {
    fun `test sync failure`(): Unit = runTest {
       val syncable = FSyncable {
          delay(1_000)
-         error("sync failure")
+         error("sync error")
       }
       val result = syncable.syncWithResult()
-      assertEquals("sync failure", result.exceptionOrNull()!!.message)
+      assertEquals("sync error", result.exceptionOrNull()!!.message)
    }
 
    @Test
@@ -45,6 +45,7 @@ class SyncableTest {
       val count = AtomicInteger(0)
 
       val syncable = FSyncable {
+         // 5秒后返回结果
          delay(5_000)
          count.incrementAndGet()
       }
