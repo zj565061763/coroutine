@@ -3,8 +3,7 @@ package com.sd.demo.coroutines
 import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -41,7 +40,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync when busy`(): Unit = runTest {
+   fun `test sync success when busy`(): Unit = runTest {
       val count = AtomicInteger(0)
 
       val syncable = FSyncable {
@@ -50,7 +49,7 @@ class SyncableTest {
          count.incrementAndGet()
       }
 
-      // 第1个协程，执行真正的逻辑，并等待结果
+      // 启动第1个协程，执行真正的逻辑，并等待结果
       val job1 = launch {
          val result = syncable.syncWithResult()
          assertEquals(1, result.getOrThrow())
@@ -67,7 +66,6 @@ class SyncableTest {
             assertEquals(1, result.getOrThrow())
             count.incrementAndGet()
          }.also { job ->
-            runCurrent()
             assertEquals(true, job.isActive)
             assertEquals(true, job1.isActive)
          }
@@ -78,43 +76,32 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel onSync`(): Unit = runTest {
-      val count = AtomicInteger()
-
+   fun `test cancel in onSync`(): Unit = runTest {
       val syncable = FSyncable {
-         count.getAndIncrement()
+         // 5秒后取消执行
          delay(5_000)
-         currentCoroutineContext().cancel()
+         throw CancellationException()
       }
 
-      launch {
-         val result: Any = try {
+      val jobs = mutableSetOf<Job>()
+      repeat(3) {
+         launch {
             syncable.syncWithResult()
-         } catch (e: Throwable) {
-            e
+         }.also {
+            jobs.add(it)
          }
-         assertEquals(true, result is CancellationException)
-         count.getAndIncrement()
-      }.also {
-         // 等待第1个协程启动
-         runCurrent()
       }
 
-      launch {
-         val result: Any = try {
-            syncable.syncWithResult()
-         } catch (e: Throwable) {
-            e
-         }
-         assertEquals(true, result is CancellationException)
-         count.getAndIncrement()
-      }.also {
-         // 等待第2个协程启动
-         runCurrent()
+      runCurrent()
+      assertEquals(3, jobs.size)
+      jobs.forEach {
+         assertEquals(true, it.isActive)
       }
 
       advanceUntilIdle()
-      assertEquals(3, count.get())
+      jobs.forEach {
+         assertEquals(true, it.isCancelled)
+      }
    }
 
    @Test
@@ -122,7 +109,7 @@ class SyncableTest {
       val count = AtomicInteger()
 
       val syncable = FSyncable {
-         count.getAndIncrement()
+         count.incrementAndGet()
          delay(Long.MAX_VALUE)
       }
 
@@ -133,7 +120,7 @@ class SyncableTest {
             e
          }
          assertEquals(true, result is CancellationException)
-         count.getAndIncrement()
+         count.incrementAndGet()
       }.also {
          // 等待第1个协程启动
          runCurrent()
@@ -146,7 +133,7 @@ class SyncableTest {
             e
          }
          assertEquals(true, result is CancellationException)
-         count.getAndIncrement()
+         count.incrementAndGet()
       }.also {
          // 等待第2个协程启动
          runCurrent()
