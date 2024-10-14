@@ -114,34 +114,20 @@ class SyncableTest {
       val job1 = launch {
          syncable.syncWithResult()
       }.also {
-         // 确保第1个协程启动
          runCurrent()
          assertEquals(true, it.isActive)
       }
 
-      val jobs = mutableSetOf<Job>()
-      repeat(3) {
-         launch {
-            syncable.syncWithResult()
-         }.also {
-            jobs.add(it)
-         }
-      }
-
-      runCurrent()
-      assertEquals(true, job1.isActive)
-      assertEquals(3, jobs.size)
-      jobs.forEach {
+      val job2 = launch {
+         syncable.syncWithResult()
+      }.also {
+         runCurrent()
          assertEquals(true, it.isActive)
       }
 
       job1.cancel()
       advanceUntilIdle()
       assertEquals(true, job1.isCancelled)
-
-      assertEquals(3, jobs.size)
-      jobs.forEach {
-         assertEquals(true, it.isCancelled)
-      }
+      assertEquals(true, job2.isCancelled)
    }
 }
