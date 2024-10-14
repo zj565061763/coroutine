@@ -4,6 +4,7 @@ import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -124,6 +125,35 @@ class SyncableTest {
          runCurrent()
          assertEquals(true, it.isActive)
       }
+
+      job1.cancel()
+      advanceUntilIdle()
+      assertEquals(true, job1.isCancelled)
+      assertEquals(true, job2.isCancelled)
+   }
+
+   @Test
+   fun `test cancel other sync`(): Unit = runTest {
+      val syncable = FSyncable {
+         delay(Long.MAX_VALUE)
+      }
+
+      val job1 = launch {
+         syncable.syncWithResult()
+      }.also {
+         runCurrent()
+         assertEquals(true, it.isActive)
+      }
+
+      val job2 = launch {
+         syncable.syncWithResult()
+      }.also {
+         runCurrent()
+         assertEquals(true, it.isActive)
+      }
+
+      job2.cancelAndJoin()
+      assertEquals(true, job1.isActive)
 
       job1.cancel()
       advanceUntilIdle()
