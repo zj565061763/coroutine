@@ -35,7 +35,7 @@ private class SyncableImpl<T>(
    }
 
    override suspend fun syncWithResult(): Result<T> {
-      if (currentCoroutineContext()[SyncElement] != null) {
+      if (currentCoroutineContext()[SyncElement]?.syncable == this@SyncableImpl) {
          throw ReSyncException("Can not call sync() in the onSync block.")
       }
       return withContext(Dispatchers.fMain) {
@@ -67,7 +67,7 @@ private class SyncableImpl<T>(
       check(!_isSync)
       return try {
          _isSync = true
-         withContext(SyncElement()) {
+         withContext(SyncElement(this@SyncableImpl)) {
             onSync()
          }.also {
             currentCoroutineContext().ensureActive()
@@ -79,7 +79,9 @@ private class SyncableImpl<T>(
    }
 }
 
-private class SyncElement : AbstractCoroutineContextElement(SyncElement) {
+private class SyncElement(
+   val syncable: FSyncable<*>,
+) : AbstractCoroutineContextElement(SyncElement) {
    companion object Key : CoroutineContext.Key<SyncElement>
 }
 
