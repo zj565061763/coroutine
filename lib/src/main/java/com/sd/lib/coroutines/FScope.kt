@@ -2,27 +2,26 @@ package com.sd.lib.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 interface FScope {
-   /**
-    * 启动协程
-    */
+   /** 启动协程 */
    fun launch(
       context: CoroutineContext = EmptyCoroutineContext,
       start: CoroutineStart = CoroutineStart.DEFAULT,
       block: suspend CoroutineScope.() -> Unit,
    ): Job
 
-   /**
-    * 取消[launch]启动的协程
-    */
+   /** 取消[launch]启动的协程 */
    fun cancel()
 }
 
@@ -33,7 +32,7 @@ fun FScope(
    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.fMain),
 ): FScope = ScopeImpl(scope = scope)
 
-private open class ScopeImpl(
+private class ScopeImpl(
    private val scope: CoroutineScope,
 ) : FScope {
    private val _holder: MutableSet<Job> = mutableSetOf()
@@ -68,17 +67,25 @@ private open class ScopeImpl(
    }
 }
 
-/**
- * 全局协程作用域，所有创建的协程只能通过对应的[Job]手动取消，
- * 不能调用[FScope.cancel]取消，否则会抛异常
- */
-val fGlobalScope: FScope = object : ScopeImpl(
-   scope = CoroutineScope(SupervisorJob() + Dispatchers.fMain)
-) {
-   override fun cancel() {
-      error("Can not cancel global scope.")
-   }
-}
-
 val Dispatchers.fMain: MainCoroutineDispatcher
    get() = runCatching { Main.immediate }.getOrDefault(Main)
+
+/**
+ * 启动全局协程，[block]总是在主线程运行
+ */
+@OptIn(DelicateCoroutinesApi::class)
+fun fGlobalLaunch(
+   context: CoroutineContext = EmptyCoroutineContext,
+   start: CoroutineStart = CoroutineStart.DEFAULT,
+   block: suspend CoroutineScope.() -> Unit,
+) {
+   GlobalScope.launch(
+      context = context,
+      start = start,
+      block = {
+         withContext(Dispatchers.fMain) {
+            block()
+         }
+      },
+   )
+}
