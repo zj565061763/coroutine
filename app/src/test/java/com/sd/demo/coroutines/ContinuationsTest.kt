@@ -4,10 +4,10 @@ import com.sd.lib.coroutines.FContinuations
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -23,13 +23,11 @@ class ContinuationsTest {
       repeat(3) {
          launch {
             val result = continuations.await()
-            count.updateAndGet {
-               it + result
-            }
+            count.updateAndGet { it + result }
          }
       }
 
-      delay(1_000)
+      runCurrent()
 
       // resumeAll
       continuations.resumeAll(1)
@@ -46,19 +44,16 @@ class ContinuationsTest {
 
       repeat(3) {
          launch {
-            val result = try {
+            try {
                continuations.await()
             } catch (e: Throwable) {
                assertEquals("resumeAllWithException 1", e.message)
-               1
-            }
-            count.updateAndGet {
-               it + result
+               count.updateAndGet { it + 1 }
             }
          }
       }
 
-      delay(1_000)
+      runCurrent()
 
       // resumeAllWithException
       continuations.resumeAllWithException(Exception("resumeAllWithException 1"))
@@ -75,19 +70,16 @@ class ContinuationsTest {
 
       repeat(3) {
          launch {
-            val result = try {
+            try {
                continuations.await()
             } catch (e: Throwable) {
                assertEquals(true, e is CancellationException)
-               1
-            }
-            count.updateAndGet {
-               it + result
+               count.updateAndGet { it + 1 }
             }
          }
       }
 
-      delay(1_000)
+      runCurrent()
 
       // cancelAll
       continuations.cancelAll()
@@ -104,19 +96,16 @@ class ContinuationsTest {
 
       repeat(3) {
          launch {
-            val result = try {
+            try {
                continuations.await()
             } catch (e: Throwable) {
                assertEquals("cancelAll with cause 1", e.message)
-               1
-            }
-            count.updateAndGet {
-               it + result
+               count.updateAndGet { it + 1 }
             }
          }
       }
 
-      delay(1_000)
+      runCurrent()
 
       // cancelAll with cause
       continuations.cancelAll(Exception("cancelAll with cause 1"))
@@ -134,19 +123,16 @@ class ContinuationsTest {
       val scope = TestScope(testScheduler)
       repeat(3) {
          scope.launch {
-            val result = try {
+            try {
                continuations.await()
             } catch (e: Throwable) {
                assertEquals(true, e is CancellationException)
-               1
-            }
-            count.updateAndGet {
-               it + result
+               count.updateAndGet { it + 1 }
             }
          }
       }
 
-      delay(1_000)
+      runCurrent()
 
       // cancel outside
       scope.cancel()
