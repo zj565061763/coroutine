@@ -62,22 +62,6 @@ class FMutator {
       }
    }
 
-   //-------------------- ext --------------------
-
-   /**
-    * 取消所有[mutate]任务
-    */
-   fun cancel() {
-      while (true) {
-         val mutator = currentMutator.get() ?: return
-         mutator.cancel()
-         currentMutator.compareAndSet(mutator, null)
-      }
-   }
-
-   /**
-    * 取消所有[mutate]任务，并等待取消完成
-    */
    suspend fun cancelAndJoin() {
       while (true) {
          val mutator = currentMutator.get() ?: return

@@ -55,24 +55,6 @@ class MutatorTest {
    }
 
    @Test
-   fun `test cancel`(): Unit = runTest {
-      val mutator = FMutator()
-      launch {
-         mutator.mutate { delay(Long.MAX_VALUE) }
-      }.let { job ->
-         delay(1_000)
-         repeat(1_000) {
-            launch {
-               mutator.cancel()
-               job.join()
-               assertEquals(true, job.isCancelled)
-               assertEquals(true, job.isCompleted)
-            }
-         }
-      }
-   }
-
-   @Test
    fun `test cancelAndJoin`(): Unit = runTest {
       val mutator = FMutator()
       launch {
