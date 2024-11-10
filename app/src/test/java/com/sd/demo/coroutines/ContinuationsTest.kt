@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @OptIn(ExperimentalCoroutinesApi::class)
 class ContinuationsTest {
    @Test
-   fun `test resumeAll`(): Unit = runTest {
+   fun `test resumeAll`() = runTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
@@ -40,7 +40,7 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test resumeAllWithException`(): Unit = runTest {
+   fun `test resumeAllWithException`() = runTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
@@ -69,7 +69,7 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancelAll`(): Unit = runTest {
+   fun `test cancelAll`() = runTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
@@ -98,7 +98,7 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancelAll with cause`(): Unit = runTest {
+   fun `test cancelAll with cause`() = runTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 
@@ -127,7 +127,7 @@ class ContinuationsTest {
    }
 
    @Test
-   fun `test cancel outside`(): Unit = runTest {
+   fun `test cancel outside`() = runTest {
       val continuations = FContinuations<Int>()
       val count = AtomicInteger(0)
 

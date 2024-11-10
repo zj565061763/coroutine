@@ -11,7 +11,7 @@ import org.junit.Test
 
 class MutatorTest {
    @Test
-   fun `test mutate`(): Unit = runTest {
+   fun `test mutate`() = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -24,7 +24,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test mutate high priority`(): Unit = runTest {
+   fun `test mutate high priority`() = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -37,7 +37,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test mutate cancel self`(): Unit = runTest {
+   fun `test mutate cancel self`() = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
@@ -55,7 +55,7 @@ class MutatorTest {
    }
 
    @Test
-   fun `test cancelAndJoin`(): Unit = runTest {
+   fun `test cancelAndJoin`() = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }

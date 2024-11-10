@@ -21,7 +21,7 @@ class SyncableTest {
    val mainDispatcherRule = MainDispatcherRule()
 
    @Test
-   fun `test sync success`(): Unit = runTest {
+   fun `test sync success`() = runTest {
       val syncable = FSyncable {
          delay(1_000)
          1
@@ -31,7 +31,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync failure`(): Unit = runTest {
+   fun `test sync failure`() = runTest {
       val syncable = FSyncable {
          delay(1_000)
          error("sync error")
@@ -41,7 +41,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync success when busy`(): Unit = runTest {
+   fun `test sync success when busy`() = runTest {
       val count = AtomicInteger(0)
 
       val syncable = FSyncable {
@@ -77,7 +77,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel in onSync`(): Unit = runTest {
+   fun `test cancel in onSync`() = runTest {
       val syncable = FSyncable {
          // 5秒后取消执行
          delay(5_000)
@@ -107,7 +107,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel first sync`(): Unit = runTest {
+   fun `test cancel first sync`() = runTest {
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
       }
@@ -133,7 +133,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel other sync`(): Unit = runTest {
+   fun `test cancel other sync`() = runTest {
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
       }
