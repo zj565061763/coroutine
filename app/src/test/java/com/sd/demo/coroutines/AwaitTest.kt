@@ -4,25 +4,17 @@ import com.sd.lib.coroutines.fAwait
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 
 class AwaitTest {
    @Test
    fun `test resume`(): Unit = runTest {
-      val count = AtomicInteger(0)
-      val result = fAwait(
-         onError = { count.incrementAndGet() },
-      ) { cont ->
+      fAwait { cont ->
          cont.resume(1)
-
-         // onError
          cont.resume(2)
-         // onError
          cont.resume(3)
+      }.let { result ->
+         assertEquals(1, result)
       }
-
-      assertEquals(1, result)
-      assertEquals(2, count.get())
    }
 }
