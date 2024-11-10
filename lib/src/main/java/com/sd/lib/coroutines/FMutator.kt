@@ -62,16 +62,28 @@ class FMutator {
       }
    }
 
-   suspend fun cancelAndJoin() {
-      while (true) {
-         val mutator = currentMutator.get() ?: return
-         mutator.cancel()
+   inline fun tryMutate(block: () -> Unit): Boolean {
+      val didLock = tryLock()
+      if (didLock) {
          try {
-            mutator.job.join()
+            block()
          } finally {
-            currentMutator.compareAndSet(mutator, null)
+            unlock()
          }
       }
+      return didLock
+   }
+
+   @PublishedApi
+   internal fun tryLock(): Boolean = mutex.tryLock()
+
+   @PublishedApi
+   internal fun unlock() {
+      mutex.unlock()
+   }
+
+   suspend fun cancelAndJoin() {
+      mutate(Int.MAX_VALUE) {}
    }
 }
 
