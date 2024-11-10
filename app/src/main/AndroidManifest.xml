@@ -22,11 +22,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SampleMutator" />
-        <activity android:name=".SampleScope" />
-        <activity android:name=".SampleContinuations" />
-        <activity android:name=".SampleSyncable" />
-
     </application>
 
 </manifest>

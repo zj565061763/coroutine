@@ -6,31 +6,10 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_SampleScope"
+        android:id="@+id/btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SampleScope"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btn_SampleMutator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SampleMutator"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btn_SampleContinuations"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SampleContinuations"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btn_SampleSyncable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SampleSyncable"
+        android:text="button"
         android:textAllCaps="false" />
 
 </LinearLayout>
