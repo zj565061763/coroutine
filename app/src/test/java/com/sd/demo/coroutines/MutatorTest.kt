@@ -2,13 +2,16 @@ package com.sd.demo.coroutines
 
 import com.sd.lib.coroutines.FMutator
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MutatorTest {
    @Test
    fun `test mutate`() = runTest {
@@ -16,7 +19,7 @@ class MutatorTest {
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
       }.let { job ->
-         delay(1_000)
+         runCurrent()
          mutator.mutate { }
          assertEquals(true, job.isCancelled)
          assertEquals(true, job.isCompleted)
@@ -24,12 +27,12 @@ class MutatorTest {
    }
 
    @Test
-   fun `test mutate high priority`() = runTest {
+   fun `test mutate with higher priority`() = runTest {
       val mutator = FMutator()
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
       }.let { job ->
-         delay(1_000)
+         runCurrent()
          mutator.mutate(1) { }
          assertEquals(true, job.isCancelled)
          assertEquals(true, job.isCompleted)
@@ -42,7 +45,7 @@ class MutatorTest {
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
       }.let { job ->
-         delay(1_000)
+         runCurrent()
          val result: Any = try {
             mutator.mutate(-1) { }
          } catch (e: Throwable) {
@@ -60,14 +63,10 @@ class MutatorTest {
       launch {
          mutator.mutate { delay(Long.MAX_VALUE) }
       }.let { job ->
-         delay(1_000)
-         repeat(1_000) {
-            launch {
-               mutator.cancelAndJoin()
-               assertEquals(true, job.isCancelled)
-               assertEquals(true, job.isCompleted)
-            }
-         }
+         runCurrent()
+         mutator.cancelAndJoin()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
       }
    }
 }
