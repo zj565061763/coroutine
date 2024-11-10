@@ -83,7 +83,11 @@ class FMutator {
    }
 
    suspend fun cancelAndJoin() {
-      mutate(Int.MAX_VALUE) {}
+      try {
+         mutate(Int.MAX_VALUE) {}
+      } catch (e: MutationInterruptedException) {
+         // ignore
+      }
    }
 }
 
