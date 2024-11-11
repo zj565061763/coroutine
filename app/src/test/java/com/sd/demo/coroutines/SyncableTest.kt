@@ -1,5 +1,6 @@
 package com.sd.demo.coroutines
 
+import app.cash.turbine.test
 import com.sd.lib.coroutines.FSyncable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,6 +39,17 @@ class SyncableTest {
       }
       val result = syncable.syncWithResult()
       assertEquals("sync error", result.exceptionOrNull()!!.message)
+   }
+
+   @Test
+   fun `test syncing flow`() = runTest {
+      val syncable = FSyncable { 1 }
+      syncable.syncingFlow.test {
+         assertEquals(false, awaitItem())
+         syncable.syncWithResult()
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+      }
    }
 
    @Test
