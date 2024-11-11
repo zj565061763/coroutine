@@ -95,6 +95,14 @@ class LoaderTest {
          loader.load { }
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
+
+         launch {
+            loader.load { delay(Long.MAX_VALUE) }
+         }
+         runCurrent()
+         loader.cancelLoad()
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
       }
    }
 
