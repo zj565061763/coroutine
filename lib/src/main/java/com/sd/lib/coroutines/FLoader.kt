@@ -67,13 +67,18 @@ private class LoaderImpl(
    private val notifyLoading: () -> Boolean,
 ) : FLoader {
    private val _mutator = FMutator()
-   private val _state = MutableStateFlow(LoaderState())
 
-   override val stateFlow: Flow<LoaderState> = _state.asStateFlow()
-   override val loadingFlow: Flow<Boolean> = stateFlow.map { it.isLoading }.distinctUntilChanged()
+   private val _stateFlow = MutableStateFlow(LoaderState())
+   override val stateFlow: Flow<LoaderState> = _stateFlow.asStateFlow()
 
-   override val state: LoaderState get() = _state.value
-   override val isLoading: Boolean get() = state.isLoading
+   override val loadingFlow: Flow<Boolean>
+      get() = stateFlow.map { it.isLoading }.distinctUntilChanged()
+
+   override val state: LoaderState
+      get() = _stateFlow.value
+
+   override val isLoading: Boolean
+      get() = state.isLoading
 
    override suspend fun <T> load(
       notifyLoading: Boolean?,
@@ -84,22 +89,22 @@ private class LoaderImpl(
          val loading = notifyLoading ?: this.notifyLoading()
          try {
             if (loading) {
-               _state.update { it.copy(isLoading = true) }
+               _stateFlow.update { it.copy(isLoading = true) }
             }
             onLoad().let { data ->
                currentCoroutineContext().ensureActive()
                Result.success(data).also {
-                  _state.update { it.copy(result = Result.success(Unit)) }
+                  _stateFlow.update { it.copy(result = Result.success(Unit)) }
                }
             }
          } catch (e: Throwable) {
             if (e is CancellationException) throw e
             Result.failure<T>(e).also {
-               _state.update { it.copy(result = Result.failure(e)) }
+               _stateFlow.update { it.copy(result = Result.failure(e)) }
             }
          } finally {
             if (loading) {
-               _state.update { it.copy(isLoading = false) }
+               _stateFlow.update { it.copy(isLoading = false) }
             }
             onFinish()
          }
