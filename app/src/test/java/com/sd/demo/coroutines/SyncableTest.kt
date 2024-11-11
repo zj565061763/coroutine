@@ -199,7 +199,7 @@ class SyncableTest {
          1
       }.also {
          array[0] = it
-         it.syncWithResult()
+         assertEquals(1, it.syncWithResult().getOrThrow())
       }
    }
 }
