@@ -185,4 +185,21 @@ class SyncableTest {
       assertEquals(true, job1.isCancelled)
       assertEquals(true, job2.isCancelled)
    }
+
+   @Test
+   fun `test reSync`() = runTest {
+      val array = arrayOf<FSyncable<*>?>(null)
+      FSyncable {
+         delay(1_000)
+         runCatching {
+            array[0]!!.syncWithResult()
+         }.also { result ->
+            assertEquals("Can not call sync in the onSync block.", result.exceptionOrNull()!!.message)
+         }
+         1
+      }.also {
+         array[0] = it
+         it.syncWithResult()
+      }
+   }
 }

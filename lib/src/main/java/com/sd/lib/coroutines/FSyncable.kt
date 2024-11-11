@@ -51,7 +51,7 @@ private class SyncableImpl<T>(
 
    override suspend fun syncWithResult(): Result<T> {
       if (currentCoroutineContext()[SyncElement]?.syncable === this@SyncableImpl) {
-         throw ReSyncException("Can not call sync() in the onSync block.")
+         throw ReSyncException("Can not call sync in the onSync block.")
       }
       return withContext(Dispatchers.fMain) {
          if (isSyncing) {
