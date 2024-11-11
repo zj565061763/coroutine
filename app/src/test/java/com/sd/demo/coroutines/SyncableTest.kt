@@ -80,7 +80,6 @@ class SyncableTest {
    @Test
    fun `test cancel in onSync`() = runTest {
       val syncable = FSyncable {
-         // 5秒后取消执行
          delay(5_000)
          throw CancellationException()
       }
@@ -155,9 +154,9 @@ class SyncableTest {
 
       job2.cancelAndJoin()
       assertEquals(true, job1.isActive)
+      assertEquals(true, job2.isCancelled)
 
-      job1.cancel()
-      advanceUntilIdle()
+      job1.cancelAndJoin()
       assertEquals(true, job1.isCancelled)
       assertEquals(true, job2.isCancelled)
    }
