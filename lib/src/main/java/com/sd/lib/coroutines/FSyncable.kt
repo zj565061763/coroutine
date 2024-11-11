@@ -12,6 +12,9 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
 interface FSyncable<T> {
+   /** 是否正在同步中 */
+   val isSyncing: Boolean
+
    /** 是否正在同步中状态 */
    val syncingFlow: Flow<Boolean>
 
@@ -36,11 +39,14 @@ private class SyncableImpl<T>(
    private val _continuations = FContinuations<Result<T>>()
    private val _syncingFlow = MutableStateFlow(false)
 
-   private var isSyncing: Boolean
+   private var _syncing: Boolean
       get() = _syncingFlow.value
       set(value) {
          _syncingFlow.value = value
       }
+
+   override val isSyncing: Boolean
+      get() = _syncing
 
    override val syncingFlow: Flow<Boolean>
       get() = _syncingFlow.asStateFlow()
@@ -54,7 +60,7 @@ private class SyncableImpl<T>(
          throw ReSyncException("Can not call sync in the onSync block.")
       }
       return withContext(Dispatchers.fMain) {
-         if (isSyncing) {
+         if (_syncing) {
             _continuations.await()
          } else {
             runCatching {
@@ -80,14 +86,14 @@ private class SyncableImpl<T>(
 
    private suspend fun startSync(): T {
       return try {
-         isSyncing = true
+         _syncing = true
          withContext(SyncElement(this@SyncableImpl)) {
             onSync()
          }.also {
             currentCoroutineContext().ensureActive()
          }
       } finally {
-         isSyncing = false
+         _syncing = false
       }
    }
 }
