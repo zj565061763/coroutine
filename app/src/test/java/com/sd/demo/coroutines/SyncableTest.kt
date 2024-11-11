@@ -53,6 +53,19 @@ class SyncableTest {
    }
 
    @Test
+   fun `test syncing flow when canceled`() = runTest {
+      val syncable = FSyncable { delay(Long.MAX_VALUE) }
+      syncable.syncingFlow.test {
+         assertEquals(false, awaitItem())
+         val job = launch { syncable.syncWithResult() }
+         runCurrent()
+         job.cancelAndJoin()
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+      }
+   }
+
+   @Test
    fun `test sync success when busy`() = runTest {
       val count = AtomicInteger(0)
 
