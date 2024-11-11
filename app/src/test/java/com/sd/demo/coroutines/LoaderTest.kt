@@ -70,6 +70,24 @@ class LoaderTest {
    }
 
    @Test
+   fun `test loading when canceled`() = runTest {
+      val loader = FLoader()
+
+      launch {
+         loader.load {
+            delay(Long.MAX_VALUE)
+            1
+         }
+      }
+
+      runCurrent()
+      assertEquals(true, loader.isLoading)
+
+      loader.cancelLoad()
+      assertEquals(false, loader.isLoading)
+   }
+
+   @Test
    fun `test loading flow`() = runTest {
       val loader = FLoader()
       loader.loadingFlow.test {
