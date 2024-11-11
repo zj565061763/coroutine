@@ -45,7 +45,6 @@ class SyncableTest {
       val count = AtomicInteger(0)
 
       val syncable = FSyncable {
-         // 5秒后返回结果
          delay(5_000)
          count.incrementAndGet()
       }
@@ -58,6 +57,7 @@ class SyncableTest {
       }.also {
          runCurrent()
          assertEquals(true, it.isActive)
+         assertEquals(0, count.get())
       }
 
       // 启动3个协程，等待结果
@@ -71,6 +71,7 @@ class SyncableTest {
 
       runCurrent()
       assertEquals(true, job1.isActive)
+      assertEquals(0, count.get())
 
       advanceUntilIdle()
       assertEquals(5, count.get())
