@@ -4,7 +4,6 @@ import com.sd.lib.coroutines.FLoader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -38,11 +37,10 @@ class LoaderTest {
    }
 
    @Test
-   fun `test loading callback true`() = runTest {
-      val loader = FLoader(notifyLoading = { true })
-
+   fun `test loading params true`() = runTest {
+      val loader = FLoader()
       launch {
-         loader.load {
+         loader.load(notifyLoading = true) {
             delay(1_000)
          }
       }
@@ -55,11 +53,10 @@ class LoaderTest {
    }
 
    @Test
-   fun `test loading callback false`() = runTest {
-      val loader = FLoader(notifyLoading = { false })
-
+   fun `test loading params false`() = runTest {
+      val loader = FLoader()
       launch {
-         loader.load {
+         loader.load(notifyLoading = false) {
             delay(1_000)
          }
       }
@@ -69,18 +66,6 @@ class LoaderTest {
 
       advanceUntilIdle()
       assertEquals(false, loader.isLoading)
-   }
-
-   @Test
-   fun `test loading params true`() = runTest {
-      testLoadingParamsTrue(FLoader(notifyLoading = { true }))
-      testLoadingParamsTrue(FLoader(notifyLoading = { false }))
-   }
-
-   @Test
-   fun `test loading params false`() = runTest {
-      testLoadingParamsFalse(FLoader(notifyLoading = { true }))
-      testLoadingParamsFalse(FLoader(notifyLoading = { false }))
    }
 
    @Test
@@ -234,34 +219,4 @@ class LoaderTest {
 
       assertEquals("onLoad|onFinish", listCallback.joinToString("|"))
    }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-private fun TestScope.testLoadingParamsTrue(loader: FLoader) {
-   launch {
-      loader.load(notifyLoading = true) {
-         delay(1_000)
-      }
-   }
-
-   runCurrent()
-   assertEquals(true, loader.isLoading)
-
-   advanceUntilIdle()
-   assertEquals(false, loader.isLoading)
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-private fun TestScope.testLoadingParamsFalse(loader: FLoader) {
-   launch {
-      loader.load(notifyLoading = false) {
-         delay(1_000)
-      }
-   }
-
-   runCurrent()
-   assertEquals(false, loader.isLoading)
-
-   advanceUntilIdle()
-   assertEquals(false, loader.isLoading)
 }
