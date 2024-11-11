@@ -2,6 +2,7 @@ package com.sd.demo.coroutines
 
 import app.cash.turbine.test
 import com.sd.lib.coroutines.FSyncable
+import com.sd.lib.coroutines.awaitIdle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -50,6 +51,30 @@ class SyncableTest {
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
       }
+   }
+
+   @Test
+   fun `test awaitIdle`() = runTest {
+      val count = AtomicInteger(0)
+      val syncable = FSyncable { delay(Long.MAX_VALUE) }
+
+      val job = launch {
+         syncable.syncWithResult()
+      }.also {
+         runCurrent()
+      }
+
+      launch {
+         syncable.awaitIdle()
+         count.incrementAndGet()
+      }.also {
+         runCurrent()
+         assertEquals(0, count.get())
+      }
+
+      job.cancel()
+      advanceUntilIdle()
+      assertEquals(1, count.get())
    }
 
    @Test

@@ -19,7 +19,7 @@ private class SafeCancellableContinuation<T>(
       try {
          continuation.resumeWith(result)
       } catch (e: IllegalStateException) {
-         e.printStackTrace()
+         // ignore
       }
    }
 }

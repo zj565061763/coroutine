@@ -7,6 +7,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
@@ -32,6 +33,13 @@ interface FSyncable<T> {
 fun <T> FSyncable(
    onSync: suspend () -> T,
 ): FSyncable<T> = SyncableImpl(onSync = onSync)
+
+/**
+ * 如果当前[FSyncable]处于同步中，则会挂起直到同步结束
+ */
+suspend fun FSyncable<*>.awaitIdle() {
+   syncingFlow.first { !it }
+}
 
 private class SyncableImpl<T>(
    private val onSync: suspend () -> T,
