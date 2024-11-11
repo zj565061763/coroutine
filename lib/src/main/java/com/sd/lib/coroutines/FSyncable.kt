@@ -57,29 +57,28 @@ private class SyncableImpl<T>(
          if (isSyncing) {
             _continuations.await()
          } else {
-            runCatching { startSync() }.also { check(!isSyncing) }
-               .onSuccess { data ->
-                  _continuations.resumeAll(Result.success(data))
-               }
-               .onFailure { error ->
-                  when (error) {
-                     is ReSyncException,
-                     is CancellationException,
-                        -> {
-                        _continuations.cancelAll()
-                        throw error
-                     }
-                     else -> {
-                        _continuations.resumeAll(Result.failure(error))
-                     }
+            runCatching {
+               startSync()
+            }.onSuccess { data ->
+               _continuations.resumeAll(Result.success(data))
+            }.onFailure { error ->
+               when (error) {
+                  is ReSyncException,
+                  is CancellationException,
+                     -> {
+                     _continuations.cancelAll()
+                     throw error
+                  }
+                  else -> {
+                     _continuations.resumeAll(Result.failure(error))
                   }
                }
+            }
          }
       }
    }
 
    private suspend fun startSync(): T {
-      check(!isSyncing)
       return try {
          isSyncing = true
          withContext(SyncElement(this@SyncableImpl)) {
@@ -88,7 +87,6 @@ private class SyncableImpl<T>(
             currentCoroutineContext().ensureActive()
          }
       } finally {
-         check(isSyncing)
          isSyncing = false
       }
    }
