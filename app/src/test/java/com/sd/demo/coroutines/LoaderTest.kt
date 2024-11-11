@@ -1,5 +1,6 @@
 package com.sd.demo.coroutines
 
+import app.cash.turbine.test
 import com.sd.lib.coroutines.FLoader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -66,6 +67,17 @@ class LoaderTest {
 
       advanceUntilIdle()
       assertEquals(false, loader.isLoading)
+   }
+
+   @Test
+   fun `test loading flow`() = runTest {
+      val loader = FLoader()
+      loader.loadingFlow.test {
+         assertEquals(false, awaitItem())
+         loader.load { }
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+      }
    }
 
    @Test
