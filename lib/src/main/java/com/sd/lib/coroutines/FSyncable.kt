@@ -15,7 +15,7 @@ interface FSyncable<T> {
    /** 是否正在同步中 */
    val isSyncing: Boolean
 
-   /** 是否正在同步中状态 */
+   /** 是否正在同步中状态流 */
    val syncingFlow: Flow<Boolean>
 
    /** 同步并等待结果 */
