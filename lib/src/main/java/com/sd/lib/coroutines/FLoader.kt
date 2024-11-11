@@ -86,8 +86,8 @@ private class LoaderImpl(
       onLoad: suspend () -> T,
    ): Result<T> {
       return _mutator.mutate {
-         val loading = notifyLoading ?: this.notifyLoading()
-         currentCoroutineContext().ensureActive()
+         val loading = notifyLoading
+            ?: this.notifyLoading().also { currentCoroutineContext().ensureActive() }
          try {
             if (loading) {
                _stateFlow.update { it.copy(isLoading = true) }
