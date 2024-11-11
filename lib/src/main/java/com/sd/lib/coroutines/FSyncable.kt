@@ -4,11 +4,17 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
 interface FSyncable<T> {
+   /** 是否正在同步中状态 */
+   val syncingFlow: Flow<Boolean>
+
    /** 同步并等待结果 */
    suspend fun syncOrThrow(): T
 
@@ -27,8 +33,17 @@ fun <T> FSyncable(
 private class SyncableImpl<T>(
    private val onSync: suspend () -> T,
 ) : FSyncable<T> {
-   private var _isSync = false
    private val _continuations = FContinuations<Result<T>>()
+   private val _syncingFlow = MutableStateFlow(false)
+
+   private var isSyncing: Boolean
+      get() = _syncingFlow.value
+      set(value) {
+         _syncingFlow.value = value
+      }
+
+   override val syncingFlow: Flow<Boolean>
+      get() = _syncingFlow.asStateFlow()
 
    override suspend fun syncOrThrow(): T {
       return syncWithResult().getOrThrow()
@@ -39,10 +54,10 @@ private class SyncableImpl<T>(
          throw ReSyncException("Can not call sync() in the onSync block.")
       }
       return withContext(Dispatchers.fMain) {
-         if (_isSync) {
+         if (isSyncing) {
             _continuations.await()
          } else {
-            runCatching { startSync() }.also { check(!_isSync) }
+            runCatching { startSync() }.also { check(!isSyncing) }
                .onSuccess { data ->
                   _continuations.resumeAll(Result.success(data))
                }
@@ -64,17 +79,17 @@ private class SyncableImpl<T>(
    }
 
    private suspend fun startSync(): T {
-      check(!_isSync)
+      check(!isSyncing)
       return try {
-         _isSync = true
+         isSyncing = true
          withContext(SyncElement(this@SyncableImpl)) {
             onSync()
          }.also {
             currentCoroutineContext().ensureActive()
          }
       } finally {
-         check(_isSync)
-         _isSync = false
+         check(isSyncing)
+         isSyncing = false
       }
    }
 }
