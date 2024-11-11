@@ -17,11 +17,12 @@ class LoaderTest {
    @Test
    fun `test load success`() = runTest {
       val loader = FLoader()
+      assertEquals(null, loader.state.result)
       loader.load {
          1
       }.let { result ->
          assertEquals(1, result.getOrThrow())
-         assertEquals(true, loader.state.result?.isSuccess)
+         assertEquals(true, loader.state.result!!.isSuccess)
       }
    }
 
