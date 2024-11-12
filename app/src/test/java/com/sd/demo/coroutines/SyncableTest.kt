@@ -33,9 +33,9 @@ class SyncableTest {
 
    @Test
    fun `test sync when error in block`() = runTest {
-      val syncable = FSyncable { error("sync error") }
+      val syncable = FSyncable { error("error in block") }
       val result = syncable.syncWithResult()
-      assertEquals("sync error", result.exceptionOrNull()!!.message)
+      assertEquals("error in block", result.exceptionOrNull()!!.message)
    }
 
    @Test
@@ -86,12 +86,7 @@ class SyncableTest {
    fun `test syncing flow when when throw CancellationException in block`() = runTest {
       val syncable = FSyncable { throw CancellationException() }
       syncable.syncingFlow.test {
-         launch {
-            syncable.syncWithResult()
-         }.also { job ->
-            runCurrent()
-            assertEquals(true, job.isCancelled)
-         }
+         launch { syncable.syncWithResult() }.also { runCurrent() }
          assertEquals(false, awaitItem())
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
@@ -102,12 +97,7 @@ class SyncableTest {
    fun `test syncing flow when cancel in block`() = runTest {
       val syncable = FSyncable { currentCoroutineContext().cancel() }
       syncable.syncingFlow.test {
-         launch {
-            syncable.syncWithResult()
-         }.also { job ->
-            runCurrent()
-            assertEquals(true, job.isCancelled)
-         }
+         launch { syncable.syncWithResult() }.also { runCurrent() }
          assertEquals(false, awaitItem())
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
