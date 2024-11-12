@@ -26,29 +26,32 @@ class SyncableTest {
 
    @Test
    fun `test sync success`() = runTest {
-      val syncable = FSyncable {
-         delay(1_000)
-         1
-      }
+      val syncable = FSyncable { 1 }
       val result = syncable.syncWithResult()
       assertEquals(1, result.getOrThrow())
    }
 
    @Test
    fun `test sync failure`() = runTest {
-      val syncable = FSyncable {
-         delay(1_000)
-         error("sync error")
-      }
+      val syncable = FSyncable { error("sync error") }
       val result = syncable.syncWithResult()
       assertEquals("sync error", result.exceptionOrNull()!!.message)
    }
 
    @Test
    fun `test sync cancel throw CancellationException`() = runTest {
-      val syncable = FSyncable {
-         throw CancellationException()
+      val syncable = FSyncable { throw CancellationException() }
+      launch {
+         syncable.syncWithResult()
+      }.also { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
       }
+   }
+
+   @Test
+   fun `test sync cancel in block`() = runTest {
+      val syncable = FSyncable { currentCoroutineContext().cancel() }
       launch {
          syncable.syncWithResult()
       }.also { job ->
