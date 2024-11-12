@@ -2,6 +2,7 @@ package com.sd.lib.coroutines
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,7 +68,9 @@ private class SyncableImpl<T>(
             try {
                _syncing = true
                withContext(SyncElement(this@SyncableImpl)) {
-                  runCatching { onSync() }
+                  runCatching {
+                     coroutineScope { onSync() }
+                  }
                }.onSuccess { data ->
                   _continuations.resumeAll(Result.success(data))
                }.onFailure { error ->
