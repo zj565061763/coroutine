@@ -240,6 +240,35 @@ class SyncableTest {
    }
 
    @Test
+   fun `test sync multi times when cancel in block`() = runTest {
+      val syncable = FSyncable {
+         delay(5_000)
+         currentCoroutineContext().cancel()
+      }
+
+      val jobs = mutableSetOf<Job>()
+      repeat(3) {
+         launch {
+            syncable.syncWithResult()
+         }.also {
+            jobs.add(it)
+         }
+      }
+
+      runCurrent()
+      assertEquals(3, jobs.size)
+      jobs.forEach {
+         assertEquals(true, it.isActive)
+      }
+
+      advanceUntilIdle()
+      assertEquals(3, jobs.size)
+      jobs.forEach {
+         assertEquals(true, it.isCancelled)
+      }
+   }
+
+   @Test
    fun `test sync multi times when cancel first sync`() = runTest {
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
