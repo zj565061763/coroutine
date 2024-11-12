@@ -41,6 +41,19 @@ class LoaderTest {
    }
 
    @Test
+   fun `test load when cancelLoad`() = runTest {
+      val loader = FLoader()
+      launch {
+         loader.load { delay(Long.MAX_VALUE) }
+      }.also { job ->
+         runCurrent()
+         loader.cancelLoad()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+      }
+   }
+
+   @Test
    fun `test loadingFlow when params true`() = runTest {
       val loader = FLoader()
       loader.loadingFlow.test {
@@ -85,26 +98,9 @@ class LoaderTest {
          ) {
             1
          }
-      }.let { result ->
+      }.also { result ->
          assertEquals("onFinish error", result.exceptionOrNull()!!.message)
       }
-   }
-
-   @Test
-   fun `test cancelLoad`() = runTest {
-      val loader = FLoader()
-
-      val job = launch {
-         loader.load {
-            delay(Long.MAX_VALUE)
-            1
-         }
-      }
-
-      runCurrent()
-      loader.cancelLoad()
-      assertEquals(true, job.isCancelled)
-      assertEquals(true, job.isCompleted)
    }
 
    @Test
