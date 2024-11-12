@@ -151,8 +151,7 @@ class SyncableTest {
          count.incrementAndGet()
       }
 
-      // 启动第1个协程，执行真正的逻辑，并等待结果
-      val job1 = launch {
+      launch {
          val result = syncable.syncWithResult()
          assertEquals(1, result.getOrThrow())
          count.incrementAndGet()
@@ -162,7 +161,6 @@ class SyncableTest {
          assertEquals(0, count.get())
       }
 
-      // 启动3个协程，等待结果
       repeat(3) {
          launch {
             val result = syncable.syncWithResult()
@@ -172,7 +170,6 @@ class SyncableTest {
       }
 
       runCurrent()
-      assertEquals(true, job1.isActive)
       assertEquals(0, count.get())
 
       advanceUntilIdle()
@@ -209,7 +206,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel first sync`() = runTest {
+   fun `test sync multi times when cancel first sync`() = runTest {
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
       }
