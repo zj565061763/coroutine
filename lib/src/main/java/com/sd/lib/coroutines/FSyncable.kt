@@ -19,7 +19,7 @@ interface FSyncable<T> {
    /** 是否正在同步中状态流 */
    val syncingFlow: Flow<Boolean>
 
-   /** 同步并等待结果 */
+   /** 同步并等待结果，如果有异常则抛出 */
    suspend fun syncOrThrow(): T
 
    /** 同步并等待结果 */
