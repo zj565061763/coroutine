@@ -177,6 +177,40 @@ class SyncableTest {
    }
 
    @Test
+   fun `test sync multi times when error in block`() = runTest {
+      val count = AtomicInteger(0)
+
+      val syncable = FSyncable {
+         delay(5_000)
+         error("error in block")
+      }
+
+      launch {
+         val result = syncable.syncWithResult()
+         assertEquals("error in block", result.exceptionOrNull()!!.message)
+         count.incrementAndGet()
+      }.also {
+         runCurrent()
+         assertEquals(true, it.isActive)
+         assertEquals(0, count.get())
+      }
+
+      repeat(3) {
+         launch {
+            val result = syncable.syncWithResult()
+            assertEquals("error in block", result.exceptionOrNull()!!.message)
+            count.incrementAndGet()
+         }
+      }
+
+      runCurrent()
+      assertEquals(0, count.get())
+
+      advanceUntilIdle()
+      assertEquals(4, count.get())
+   }
+
+   @Test
    fun `test sync multi times when throw CancellationException in block`() = runTest {
       val syncable = FSyncable {
          delay(5_000)
