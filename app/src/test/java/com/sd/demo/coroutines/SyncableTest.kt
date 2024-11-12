@@ -232,7 +232,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel other sync`() = runTest {
+   fun `test sync multi times when cancel other sync`() = runTest {
       val syncable = FSyncable {
          delay(Long.MAX_VALUE)
       }
