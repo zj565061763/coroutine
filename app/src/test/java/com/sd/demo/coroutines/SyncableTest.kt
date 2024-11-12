@@ -123,9 +123,7 @@ class SyncableTest {
    @Test
    fun `test awaitIdle`() = runTest {
       val count = AtomicInteger(0)
-      val syncable = FSyncable {
-         delay(5_000)
-      }
+      val syncable = FSyncable { delay(5_000) }
 
       launch {
          syncable.syncWithResult()
@@ -139,10 +137,9 @@ class SyncableTest {
       }.also {
          runCurrent()
          assertEquals(0, count.get())
+         advanceUntilIdle()
+         assertEquals(1, count.get())
       }
-
-      advanceUntilIdle()
-      assertEquals(1, count.get())
    }
 
    @Test
