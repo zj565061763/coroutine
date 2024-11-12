@@ -19,25 +19,25 @@ import org.junit.Test
 class LoaderTest {
 
    @Test
-   fun `test load success`() = runTest {
+   fun `test load when success`() = runTest {
       val loader = FLoader()
       assertEquals(null, loader.state.result)
       loader.load {
          1
-      }.let { result ->
-         assertEquals(1, result.getOrThrow())
+      }.also { result ->
          assertEquals(true, loader.state.result!!.isSuccess)
+         assertEquals(1, result.getOrThrow())
       }
    }
 
    @Test
-   fun `test load failure`() = runTest {
+   fun `test load when error in block`() = runTest {
       val loader = FLoader()
       loader.load {
-         error("load error")
-      }.let { result ->
-         assertEquals("load error", result.exceptionOrNull()!!.message)
-         assertEquals("load error", loader.state.result!!.exceptionOrNull()!!.message)
+         error("error in block")
+      }.also { result ->
+         assertEquals("error in block", result.exceptionOrNull()!!.message)
+         assertEquals("error in block", loader.state.result!!.exceptionOrNull()!!.message)
       }
    }
 
