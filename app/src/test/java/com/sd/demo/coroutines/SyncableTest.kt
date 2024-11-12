@@ -261,7 +261,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test reSync`() = runTest {
+   fun `test reSync error`() = runTest {
       val array = arrayOf<FSyncable<*>?>(null)
       FSyncable {
          delay(1_000)
