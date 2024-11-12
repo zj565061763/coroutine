@@ -40,6 +40,25 @@ class LoaderTest {
    }
 
    @Test
+   fun `test load when loading`() = runTest {
+      val loader = FLoader()
+
+      val job = launch {
+         loader.load { delay(Long.MAX_VALUE) }
+      }.also {
+         runCurrent()
+      }
+
+      loader.load {
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+         2
+      }.also { result ->
+         assertEquals(2, result.getOrThrow())
+      }
+   }
+
+   @Test
    fun `test load when cancelLoad`() = runTest {
       val loader = FLoader()
       launch {
@@ -121,28 +140,6 @@ class LoaderTest {
          assertEquals(false, awaitItem())
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
-      }
-   }
-
-   @Test
-   fun `test load when loading`() = runTest {
-      val loader = FLoader()
-
-      val job = launch {
-         loader.load {
-            delay(Long.MAX_VALUE)
-            1
-         }
-      }
-
-      runCurrent()
-
-      loader.load {
-         assertEquals(true, job.isCancelled)
-         assertEquals(true, job.isCompleted)
-         2
-      }.let { result ->
-         assertEquals(2, result.getOrThrow())
       }
    }
 
