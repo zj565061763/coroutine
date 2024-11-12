@@ -6,7 +6,9 @@ import com.sd.lib.coroutines.awaitIdle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -43,6 +45,19 @@ class SyncableTest {
    }
 
    @Test
+   fun `test sync cancel throw CancellationException`() = runTest {
+      val syncable = FSyncable {
+         throw CancellationException()
+      }
+      launch {
+         syncable.syncWithResult()
+      }.also { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
+      }
+   }
+
+   @Test
    fun `test syncing flow when success`() = runTest {
       val syncable = FSyncable { 1 }
       syncable.syncingFlow.test {
@@ -65,13 +80,32 @@ class SyncableTest {
    }
 
    @Test
-   fun `test syncing flow when canceled`() = runTest {
+   fun `test syncing flow when cancel sync`() = runTest {
       val syncable = FSyncable { delay(Long.MAX_VALUE) }
       syncable.syncingFlow.test {
          assertEquals(false, awaitItem())
-         val job = launch { syncable.syncWithResult() }
-         runCurrent()
-         job.cancelAndJoin()
+         launch {
+            syncable.syncWithResult()
+         }.also { job ->
+            runCurrent()
+            job.cancelAndJoin()
+         }
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+      }
+   }
+
+   @Test
+   fun `test syncing flow when cancel in block`() = runTest {
+      val syncable = FSyncable { currentCoroutineContext().cancel() }
+      syncable.syncingFlow.test {
+         assertEquals(false, awaitItem())
+         launch {
+            syncable.syncWithResult()
+         }.also { job ->
+            runCurrent()
+            assertEquals(true, job.isCancelled)
+         }
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
       }
