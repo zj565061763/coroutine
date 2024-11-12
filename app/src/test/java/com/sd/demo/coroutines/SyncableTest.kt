@@ -43,7 +43,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test syncing flow`() = runTest {
+   fun `test syncing flow when success`() = runTest {
       val syncable = FSyncable { 1 }
       syncable.syncingFlow.test {
          assertEquals(false, awaitItem())
@@ -54,27 +54,14 @@ class SyncableTest {
    }
 
    @Test
-   fun `test awaitIdle`() = runTest {
-      val count = AtomicInteger(0)
-      val syncable = FSyncable { delay(Long.MAX_VALUE) }
-
-      val job = launch {
+   fun `test syncing flow when error`() = runTest {
+      val syncable = FSyncable { error("error") }
+      syncable.syncingFlow.test {
+         assertEquals(false, awaitItem())
          syncable.syncWithResult()
-      }.also {
-         runCurrent()
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
       }
-
-      launch {
-         syncable.awaitIdle()
-         count.incrementAndGet()
-      }.also {
-         runCurrent()
-         assertEquals(0, count.get())
-      }
-
-      job.cancel()
-      advanceUntilIdle()
-      assertEquals(1, count.get())
    }
 
    @Test
@@ -88,6 +75,31 @@ class SyncableTest {
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
       }
+   }
+
+   @Test
+   fun `test awaitIdle`() = runTest {
+      val count = AtomicInteger(0)
+      val syncable = FSyncable {
+         delay(5_000)
+      }
+
+      launch {
+         syncable.syncWithResult()
+      }.also {
+         runCurrent()
+      }
+
+      launch {
+         syncable.awaitIdle()
+         count.incrementAndGet()
+      }.also {
+         runCurrent()
+         assertEquals(0, count.get())
+      }
+
+      advanceUntilIdle()
+      assertEquals(1, count.get())
    }
 
    @Test
