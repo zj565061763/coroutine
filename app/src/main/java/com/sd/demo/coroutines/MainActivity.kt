@@ -11,6 +11,10 @@ class MainActivity : AppCompatActivity() {
    override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       setContentView(_binding.root)
+
+      _binding.btn.setOnClickListener {
+
+      }
    }
 }
 
