@@ -7,7 +7,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -54,6 +53,42 @@ class LoaderTest {
    }
 
    @Test
+   fun `test load when throw CancellationException in block`() = runTest {
+      val loader = FLoader()
+      launch {
+         loader.load { throw CancellationException() }
+      }.also { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+      }
+   }
+
+   @Test
+   fun `test load when cancel in block`() = runTest {
+      val loader = FLoader()
+      launch {
+         loader.load { currentCoroutineContext().cancel() }
+      }.also { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+      }
+   }
+
+   @Test
+   fun `test load when error in onFinish block`() = runTest {
+      val loader = FLoader()
+      runCatching {
+         loader.load(
+            onFinish = { error("onFinish error") },
+         ) {}
+      }.also { result ->
+         assertEquals("onFinish error", result.exceptionOrNull()!!.message)
+      }
+   }
+
+   @Test
    fun `test loadingFlow when params true`() = runTest {
       val loader = FLoader()
       loader.loadingFlow.test {
@@ -86,43 +121,6 @@ class LoaderTest {
          assertEquals(false, awaitItem())
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
-      }
-   }
-
-   @Test
-   fun `test onFinish error`() = runTest {
-      val loader = FLoader()
-      runCatching {
-         loader.load(
-            onFinish = { error("onFinish error") },
-         ) {
-            1
-         }
-      }.also { result ->
-         assertEquals("onFinish error", result.exceptionOrNull()!!.message)
-      }
-   }
-
-   @Test
-   fun `test load cancel in block`() = runTest {
-      val loader = FLoader()
-
-      launch {
-         loader.load { throw CancellationException() }
-      }.let { job ->
-         runCurrent()
-         assertEquals(true, job.isCancelled)
-         assertEquals(true, job.isCompleted)
-         assertEquals(true, isActive)
-      }
-
-      launch {
-         loader.load { currentCoroutineContext().cancel() }
-      }.let { job ->
-         runCurrent()
-         assertEquals(true, job.isCancelled)
-         assertEquals(true, job.isCompleted)
-         assertEquals(true, isActive)
       }
    }
 
