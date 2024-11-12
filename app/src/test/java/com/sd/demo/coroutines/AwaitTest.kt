@@ -8,7 +8,7 @@ import kotlin.coroutines.resume
 
 class AwaitTest {
    @Test
-   fun `test resume`() = runTest {
+   fun `resume multi times`() = runTest {
       fAwait { cont ->
          cont.resume(1)
          cont.resume(2)
