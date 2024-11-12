@@ -13,7 +13,7 @@ class AwaitTest {
          cont.resume(1)
          cont.resume(2)
          cont.resume(3)
-      }.let { result ->
+      }.also { result ->
          assertEquals(1, result)
       }
    }
