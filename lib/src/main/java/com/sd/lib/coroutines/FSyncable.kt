@@ -3,7 +3,6 @@ package com.sd.lib.coroutines
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,37 +70,24 @@ private class SyncableImpl<T>(
          if (_syncing) {
             _continuations.await()
          } else {
-            runCatching {
-               startSync()
-            }.onSuccess { data ->
-               _continuations.resumeAll(Result.success(data))
-            }.onFailure { error ->
-               when (error) {
-                  is ReSyncException,
-                  is CancellationException,
-                     -> {
-                     _continuations.cancelAll()
-                     throw error
-                  }
-                  else -> {
-                     _continuations.resumeAll(Result.failure(error))
-                  }
+            try {
+               _syncing = true
+               withContext(SyncElement(this@SyncableImpl)) {
+                  runCatching { onSync() }
+               }.onSuccess { data ->
+                  _continuations.resumeAll(Result.success(data))
+               }.onFailure { error ->
+                  /** 只检查[ReSyncException]，把其他异常当作普通异常，包括[CancellationException] */
+                  if (error is ReSyncException) throw error
+                  _continuations.resumeAll(Result.failure(error))
                }
+            } catch (e: Throwable) {
+               _continuations.cancelAll()
+               throw e
+            } finally {
+               _syncing = false
             }
          }
-      }
-   }
-
-   private suspend fun startSync(): T {
-      return try {
-         _syncing = true
-         withContext(SyncElement(this@SyncableImpl)) {
-            onSync()
-         }.also {
-            currentCoroutineContext().ensureActive()
-         }
-      } finally {
-         _syncing = false
       }
    }
 }
@@ -112,4 +98,4 @@ private class SyncElement(
    companion object Key : CoroutineContext.Key<SyncElement>
 }
 
-private class ReSyncException(message: String) : RuntimeException(message)
+private class ReSyncException(message: String) : IllegalStateException(message)
