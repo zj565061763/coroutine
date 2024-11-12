@@ -128,6 +128,24 @@ class LoaderTest {
    }
 
    @Test
+   fun `test loadingFlow when Reload`() = runTest {
+      val loader = FLoader()
+      loader.loadingFlow.test {
+         launch {
+            loader.load { delay(Long.MAX_VALUE) }
+         }.also {
+            runCurrent()
+            loader.load { }
+         }
+         assertEquals(false, awaitItem())
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+         assertEquals(true, awaitItem())
+         assertEquals(false, awaitItem())
+      }
+   }
+
+   @Test
    fun `test loadingFlow when cancelLoad`() = runTest {
       val loader = FLoader()
       loader.loadingFlow.test {
