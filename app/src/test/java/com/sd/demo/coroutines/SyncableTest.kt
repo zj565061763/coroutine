@@ -39,24 +39,26 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync cancel when throw CancellationException in block`() = runTest {
+   fun `test sync when throw CancellationException in block`() = runTest {
       val syncable = FSyncable { throw CancellationException() }
       launch {
-         syncable.syncWithResult()
+         val result = syncable.syncWithResult()
+         assertEquals(true, result.exceptionOrNull() is CancellationException)
       }.also { job ->
          runCurrent()
-         assertEquals(true, job.isCancelled)
+         assertEquals(false, job.isCancelled)
       }
    }
 
    @Test
-   fun `test sync cancel when cancel in block`() = runTest {
+   fun `test sync when cancel in block`() = runTest {
       val syncable = FSyncable { currentCoroutineContext().cancel() }
       launch {
-         syncable.syncWithResult()
+         val result = syncable.syncWithResult()
+         assertEquals(true, result.exceptionOrNull() is CancellationException)
       }.also { job ->
          runCurrent()
-         assertEquals(true, job.isCancelled)
+         assertEquals(false, job.isCancelled)
       }
    }
 
@@ -235,7 +237,7 @@ class SyncableTest {
       advanceUntilIdle()
       assertEquals(3, jobs.size)
       jobs.forEach {
-         assertEquals(true, it.isCancelled)
+         assertEquals(false, it.isCancelled)
       }
    }
 
@@ -264,7 +266,7 @@ class SyncableTest {
       advanceUntilIdle()
       assertEquals(3, jobs.size)
       jobs.forEach {
-         assertEquals(true, it.isCancelled)
+         assertEquals(false, it.isCancelled)
       }
    }
 
