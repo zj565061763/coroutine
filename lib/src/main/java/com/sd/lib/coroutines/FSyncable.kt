@@ -18,16 +18,14 @@ interface FSyncable<T> {
    /** 是否正在同步中状态流 */
    val syncingFlow: Flow<Boolean>
 
-   /** 同步并等待结果，如果有异常则抛出 */
-   suspend fun syncOrThrow(): T
-
    /** 同步并等待结果 */
    suspend fun syncWithResult(): Result<T>
 }
 
 /**
- * 当外部调用[FSyncable]的同步方法时，如果[FSyncable]处于空闲状态，则当前协程会切换到主线程执行[onSync]，
- * 如果执行未完成时又有新协程调用同步方法，则新协程会挂起等待结果。
+ * 当外部调用[FSyncable.syncWithResult]时，如果[FSyncable]处于空闲状态，则当前协程会切换到主线程执行[onSync]，
+ * 如果执行未完成时又有新协程调用[FSyncable.syncWithResult]方法，则新协程会挂起等待结果，
+ * 注意：[onSync]中的所有异常都会被捕获，包括[CancellationException]
  */
 fun <T> FSyncable(
    onSync: suspend () -> T,
@@ -57,10 +55,6 @@ private class SyncableImpl<T>(
 
    override val syncingFlow: Flow<Boolean>
       get() = _syncingFlow.asStateFlow()
-
-   override suspend fun syncOrThrow(): T {
-      return syncWithResult().getOrThrow()
-   }
 
    override suspend fun syncWithResult(): Result<T> {
       if (currentCoroutineContext()[SyncElement]?.syncable === this@SyncableImpl) {
