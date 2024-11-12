@@ -9,7 +9,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,69 +41,36 @@ class LoaderTest {
    }
 
    @Test
-   fun `test loading params true`() = runTest {
-      val loader = FLoader()
-      launch {
-         loader.load(notifyLoading = true) {
-            delay(1_000)
-         }
-      }
-
-      runCurrent()
-      assertEquals(true, loader.isLoading)
-
-      advanceUntilIdle()
-      assertEquals(false, loader.isLoading)
-   }
-
-   @Test
-   fun `test loading params false`() = runTest {
-      val loader = FLoader()
-      launch {
-         loader.load(notifyLoading = false) {
-            delay(1_000)
-         }
-      }
-
-      runCurrent()
-      assertEquals(false, loader.isLoading)
-
-      advanceUntilIdle()
-      assertEquals(false, loader.isLoading)
-   }
-
-   @Test
-   fun `test loading when canceled`() = runTest {
-      val loader = FLoader()
-
-      launch {
-         loader.load {
-            delay(Long.MAX_VALUE)
-            1
-         }
-      }
-
-      runCurrent()
-      assertEquals(true, loader.isLoading)
-
-      loader.cancelLoad()
-      assertEquals(false, loader.isLoading)
-   }
-
-   @Test
-   fun `test loading flow`() = runTest {
+   fun `test loadingFlow when params true`() = runTest {
       val loader = FLoader()
       loader.loadingFlow.test {
+         loader.load(notifyLoading = true) {}
          assertEquals(false, awaitItem())
-         loader.load { }
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
+      }
+   }
 
+   @Test
+   fun `test loadingFlow when params false`() = runTest {
+      val loader = FLoader()
+      loader.loadingFlow.test {
+         loader.load(notifyLoading = false) {}
+         assertEquals(false, awaitItem())
+      }
+   }
+
+   @Test
+   fun `test loadingFlow when cancelLoad`() = runTest {
+      val loader = FLoader()
+      loader.loadingFlow.test {
          launch {
             loader.load { delay(Long.MAX_VALUE) }
+         }.also {
+            runCurrent()
+            loader.cancelLoad()
          }
-         runCurrent()
-         loader.cancelLoad()
+         assertEquals(false, awaitItem())
          assertEquals(true, awaitItem())
          assertEquals(false, awaitItem())
       }
