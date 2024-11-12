@@ -170,10 +170,14 @@ private class FMutator {
    }
 
    suspend fun cancelAndJoin() {
-      try {
-         mutate(Int.MAX_VALUE) {}
-      } catch (e: MutationInterruptedException) {
-         // ignore
+      while (true) {
+         val mutator = currentMutator.get() ?: return
+         mutator.cancel()
+         try {
+            mutator.job.join()
+         } finally {
+            currentMutator.compareAndSet(mutator, null)
+         }
       }
    }
 }
