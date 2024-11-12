@@ -143,7 +143,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test sync success when busy`() = runTest {
+   fun `test sync multi times when success `() = runTest {
       val count = AtomicInteger(0)
 
       val syncable = FSyncable {
@@ -180,7 +180,7 @@ class SyncableTest {
    }
 
    @Test
-   fun `test cancel in onSync`() = runTest {
+   fun `test sync multi times when throw CancellationException in block`() = runTest {
       val syncable = FSyncable {
          delay(5_000)
          throw CancellationException()
