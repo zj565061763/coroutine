@@ -2,8 +2,12 @@ package com.sd.demo.coroutines
 
 import app.cash.turbine.test
 import com.sd.lib.coroutines.FLoader
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -121,7 +125,7 @@ class LoaderTest {
    }
 
    @Test
-   fun `test load cancel`() = runTest {
+   fun `test cancelLoad`() = runTest {
       val loader = FLoader()
 
       val job = launch {
@@ -133,9 +137,31 @@ class LoaderTest {
 
       runCurrent()
       loader.cancelLoad()
-
       assertEquals(true, job.isCancelled)
       assertEquals(true, job.isCompleted)
+   }
+
+   @Test
+   fun `test load cancel in block`() = runTest {
+      val loader = FLoader()
+
+      launch {
+         loader.load { throw CancellationException() }
+      }.let { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+         assertEquals(true, isActive)
+      }
+
+      launch {
+         loader.load { currentCoroutineContext().cancel() }
+      }.let { job ->
+         runCurrent()
+         assertEquals(true, job.isCancelled)
+         assertEquals(true, job.isCompleted)
+         assertEquals(true, isActive)
+      }
    }
 
    @Test
